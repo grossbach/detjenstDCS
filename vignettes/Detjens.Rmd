@@ -70,24 +70,7 @@ fnames <- get_correct_fnames(relevant_fnames,
                              unique_days, 
                              tm,
                              status)
-n_fnames <- length(fnames)
-## Read in as follows:
-## ID   Day Time  Scale Ascend  IOI   Fname
-## ---  --- ----  ----- ------  ----  --------------------------
-## P03  1   pre   1     1       107   P03_d1_pre_bearbeitet.xlsx
-##
-midi_data <- data.frame(ID = character(0),
-                        Day = character(0),
-                        Time = character(0),
-                        Scale = integer(0),
-                        Ascend = integer(0),
-                        IOI = numeric(0),
-                        Fname = character(0))
-for (fn in 1:n_fnames) {
-  tab <- readxl::read_xlsx(list.files(path = path_to_files, 
-                                      pattern = fnames[fn], 
-                                      full.names = TRUE, recursive = TRUE))
-}
+mdata <- read_midi_data(fnames, path_to_files)
 ```
 
 

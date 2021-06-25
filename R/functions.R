@@ -49,3 +49,58 @@ get_correct_fnames <- function(all_fnames, p_code, day, time_, stat) {
   }
   return(fnames)
 }
+read_midi_data <- function(filenames, path2files) {
+  ## Read in as follows:
+  ## ID   Day Time  MIDInote  Scale Ascend  IOI   Fname
+  ## ---  --- ----  --------  ----- ------  ----  --------------------------
+  ## P03  1   pre   62        1     1       107   P03_d1_pre_bearbeitet.xlsx
+  ##
+  midi_data <- data.frame(ID = character(0),
+                          Day = character(0),
+                          Time = character(0),
+                          Scale = integer(0),
+                          Ascend = integer(0),
+                          IOI = numeric(0),
+                          Fname = character(0))
+  n_fnames <- length(filenames)
+  for (fn in 1:n_fnames) {
+    tab <- readxl::read_xlsx(list.files(path = path_to_files,
+                                        pattern = filenames[fn],
+                                        full.names = TRUE, recursive = TRUE),
+                             sheet = "ID added")
+    tab_names <- names(tab)
+    approx_col_names <- c("note_actual",
+                          "scale number",
+                          "1=ascend",
+                          "IOI")
+    col_idx <- mgrep(approx_col_names, tab_names)
+    extract <- tab[ , col_idx]
+    if (filenames[fn] == "P01_d8_post_bearbeitet.xlsx")
+      browser()
+    names(extract) <- c("MIDInote", "Scale", "Ascend", "IOI")
+    extract <- dplyr::mutate(extract,
+                             ID = stringr::str_extract(filenames[fn], "^P0\\d{1}"),
+                             Day = stringr::str_extract(filenames[fn], "d\\d{1,2}"),
+                             Time = stringr::str_extract(filenames[fn], "(pre|post)"),
+                             Fname = filenames[fn])
+    extract <- dplyr::relocate(extract,
+                               c("ID", "Day", "Time", "MIDInote", "Scale", "Ascend", "IOI", "Fname"))
+    midi_data <- rbind(midi_data,
+                       extract)
+  }
+  return(midi_data)
+}
+mgrep <- function(pattern, x) {
+  stopifnot(is.character(pattern),
+            is.character(x))
+  matches <- NULL
+  pattern_len <- length(pattern)
+  x_len <- length(x)
+  for (p_n in 1:pattern_len) {
+      matches <- c(matches,
+                   grep(pattern = pattern[p_n],
+                        x = x,
+                        perl = TRUE))
+  }
+  return(matches)
+}
