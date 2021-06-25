@@ -1,0 +1,71 @@
+---
+title: "I. Detjens: tDCS bei dystonen PianistInnen"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{I. Detjens: tDCS bei dystonen PianistInnen}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+bibliography: /home/grossbach/files/_sonstiges/000literaturdb.bib
+csl: /home/grossbach/files/_sonstiges/frontiers-in-neuroscience.csl
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NULL
+)
+```
+
+```{r setup}
+library(detjenstDCS)
+## ggplot2:
+ggplot2::theme_set(ggplot2::theme_light(base_size = 10))
+## knitr & kfigr:
+knitr::knit_hooks$set(anchor = kfigr::hook_anchor)
+knitr::opts_knit$set(kfigr.link = TRUE,
+                     kfigr.prefix = TRUE)
+knitr::opts_chunk$set(comment = NULL,
+                      echo = FALSE,
+                      fig.width = 7,
+                      fig.height = 5,
+                      cache = FALSE)
+## rstan:
+options(mc.cores = parallel::detectCores(),
+        digits = 3,
+        knitr.kable.NA = "")
+rstan::rstan_options(auto_write = TRUE)
+## Constants:
+MODEL <- FALSE # Set to TRUE to run computationally costly models
+DO_IT <- FALSE # Set to TRUE to run simulation models
+DIAGN_PLOTS <- FALSE # Set to TRUE to show diagnostic plots
+FIGREF <- "Fig." # type for pics and plots, kfigr::figr()
+TABREF <- "Tab." # type for tables, kfigr::figr()
+PRIORREF <- "Prior" # type for priors, kfigr::figr()
+EQREF <- "Eq." # type for model equations, kfigr::figr()
+SRCREF <- "Src." # type for source code blocks, kfigr::figr()
+path_to_files <- "../data/"
+```
+
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 14 Tagen (d1 und d15) mit tDC stimuliert, und vorher (pre) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48).
+
+```{r}
+## Extract patient codes from directories:
+patient_codes <- get_patient_code(path_to_files)
+relevant_fnames <- list.files(path = path, 
+                                pattern = ".*\\.xlsx$", 
+                                recursive = TRUE, 
+                                full.names = TRUE)
+nfiles <- length(relevant_fnames)
+## Read in as follows:
+## ID   Day Time  Scale Ascend  IOI
+## ---  --- ----  ----- ------  ----
+## P03  1   pre   1     1       107
+## 
+for (fn in 1:nfiles) {
+  tab <- readxl::read_xlsx(relevant_fnames[fn])
+}
+```
+
+
