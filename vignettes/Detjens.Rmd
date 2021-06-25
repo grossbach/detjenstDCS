@@ -2,8 +2,8 @@
 title: "I. Detjens: tDCS bei dystonen PianistInnen"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{I. Detjens: tDCS bei dystonen PianistInnen}
   %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{I. Detjens: tDCS bei dystonen PianistInnen}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
@@ -45,26 +45,48 @@ TABREF <- "Tab." # type for tables, kfigr::figr()
 PRIORREF <- "Prior" # type for priors, kfigr::figr()
 EQREF <- "Eq." # type for model equations, kfigr::figr()
 SRCREF <- "Src." # type for source code blocks, kfigr::figr()
-path_to_files <- "../data/"
+path_to_files <- "../data"
 ```
 
-Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 14 Tagen (d1 und d15) mit tDC stimuliert, und vorher (pre) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48).
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) mit tDC stimuliert. Vorher (prä) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48).
 
 ```{r}
 ## Extract patient codes from directories:
 patient_codes <- get_patient_code(path_to_files)
-relevant_fnames <- list.files(path = path, 
-                                pattern = ".*\\.xlsx$", 
-                                recursive = TRUE, 
-                                full.names = TRUE)
-nfiles <- length(relevant_fnames)
+relevant_fnames <- list.files(path = path_to_files, 
+                              pattern = ".*\\.xlsx$", 
+                              recursive = TRUE, 
+                              full.names = TRUE)
+unique_days <- get_day_numbers(relevant_fnames)
+tm <- c("pre", "post", "")
+status <- c("bearbeitet_extra_included", 
+            "bearbeitet", 
+            "")
+# fname_components <- expand.grid(factor(patient_codes), 
+#                                 factor(unique_days),
+#                                 factor(status))
+fnames <- get_correct_fnames(relevant_fnames,
+                             patient_codes, 
+                             unique_days, 
+                             tm,
+                             status)
+n_fnames <- length(fnames)
 ## Read in as follows:
-## ID   Day Time  Scale Ascend  IOI
-## ---  --- ----  ----- ------  ----
-## P03  1   pre   1     1       107
-## 
-for (fn in 1:nfiles) {
-  tab <- readxl::read_xlsx(relevant_fnames[fn])
+## ID   Day Time  Scale Ascend  IOI   Fname
+## ---  --- ----  ----- ------  ----  --------------------------
+## P03  1   pre   1     1       107   P03_d1_pre_bearbeitet.xlsx
+##
+midi_data <- data.frame(ID = character(0),
+                        Day = character(0),
+                        Time = character(0),
+                        Scale = integer(0),
+                        Ascend = integer(0),
+                        IOI = numeric(0),
+                        Fname = character(0))
+for (fn in 1:n_fnames) {
+  tab <- readxl::read_xlsx(list.files(path = path_to_files, 
+                                      pattern = fnames[fn], 
+                                      full.names = TRUE, recursive = TRUE))
 }
 ```
 
