@@ -58,6 +58,8 @@ read_midi_data <- function(filenames, path2files) {
   midi_data <- data.frame(ID = character(0),
                           Day = character(0),
                           Time = character(0),
+                          Scale = integer(0),
+                          MIDInote = character(0),
                           Ascend = integer(0),
                           IOI = numeric(0),
                           Fname = character(0))
@@ -70,17 +72,20 @@ read_midi_data <- function(filenames, path2files) {
     tab_names <- names(tab)
     approx_col_names <- c("note_actual",
                           "1=ascend",
+                          "scale number",
                           "IOI")
+
     col_idx <- mgrep(approx_col_names, tab_names)
-    extract <- tab[ , col_idx]
-    names(extract) <- c("MIDInote", "Ascend", "IOI")
+    col_names <- tab_names[col_idx]
+    extract <- tab[ , col_names]
+    names(extract) <- c("MIDInote", "Ascend", "Scale", "IOI")
     extract <- dplyr::mutate(extract,
                              ID = stringr::str_extract(filenames[fn], "^P0\\d{1}"),
                              Day = stringr::str_extract(filenames[fn], "d\\d{1,2}"),
                              Time = stringr::str_extract(filenames[fn], "(pre|post)"),
                              Fname = filenames[fn])
     extract <- dplyr::relocate(extract,
-                               c("ID", "Day", "Time", "MIDInote", "Ascend", "IOI", "Fname"))
+                               c("ID", "Day", "Time", "Scale", "MIDInote", "Ascend", "IOI", "Fname"))
     midi_data <- rbind(midi_data,
                        extract)
   }
@@ -99,4 +104,7 @@ mgrep <- function(pattern, x) {
                         perl = TRUE))
   }
   return(matches)
+}
+mgrepl <- function(pattern, x) {
+  return(as.logical(mgrep(pattern, x)))
 }

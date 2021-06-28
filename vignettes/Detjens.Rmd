@@ -1,5 +1,6 @@
 ---
 title: "I. Detjens: tDCS bei dystonen PianistInnen"
+date: "Draft `r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteEncoding{UTF-8}
@@ -12,10 +13,9 @@ csl: /home/grossbach/files/_sonstiges/frontiers-in-neuroscience.csl
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = NULL
-)
+knitr::opts_chunk$set(collapse = TRUE,
+                      comment = NULL,
+                      echo = FALSE)
 ```
 
 ```{r setup}
@@ -45,12 +45,16 @@ TABREF <- "Tab." # type for tables, kfigr::figr()
 PRIORREF <- "Prior" # type for priors, kfigr::figr()
 EQREF <- "Eq." # type for model equations, kfigr::figr()
 SRCREF <- "Src." # type for source code blocks, kfigr::figr()
-path_to_files <- "../data"
+path_to_files <- "../../data"
 ```
 
-Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) mit tDC stimuliert. Vorher (prä) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48).
+# Methoden
 
-```{r}
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) mit tDC stimuliert. Vorher (prä) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48). Bei PatientIn P05 fehlen die Daten von Tag 15 sowie die follow-up-Messung. 
+
+Alle PatientInnen außer P04 spielten die Tonleitern in Sechzehnteln zu einem auf 120 bpm eingestellten Metronom. Bei dieser Spielgeschwindigkeit dauert das nominelle Inter-onset Interval (IOI) `r 1000 / (120 * 4 / 60)` ms, bei 100 bpm (PatientIn P04) entsprechend `r 1000 / (100 * 4 / 60)` ms.
+
+```{r ReadData, message=FALSE}
 ## Extract patient codes from directories:
 patient_codes <- get_patient_code(path_to_files)
 relevant_fnames <- list.files(path = path_to_files, 
@@ -58,13 +62,10 @@ relevant_fnames <- list.files(path = path_to_files,
                               recursive = TRUE, 
                               full.names = TRUE)
 unique_days <- get_day_numbers(relevant_fnames)
-tm <- c("pre", "post", "")
+tm <- c("pre", "post", "") # time codes
 status <- c("bearbeitet_extra_included", 
             "bearbeitet", 
             "")
-# fname_components <- expand.grid(factor(patient_codes), 
-#                                 factor(unique_days),
-#                                 factor(status))
 fnames <- get_correct_fnames(relevant_fnames,
                              patient_codes, 
                              unique_days, 
@@ -73,4 +74,207 @@ fnames <- get_correct_fnames(relevant_fnames,
 mdata <- read_midi_data(fnames, path_to_files)
 ```
 
+```{r PrepareData}
+mdata$Time[is.na(mdata$Time)] <- "follow_up" # set "Time" of follow-up measurements (arbitrarily) to pre
+mdata <- dplyr::mutate(mdata,
+                       ID = factor(ID),
+                       Day = factor(Day, 
+                                    ordered = TRUE, 
+                                    labels = c("d1", "d8", "d15", "d43"),
+                                    levels = c("d1", "d8", "d15", "d43")),
+                       Time = factor(Time,
+                                     labels = c("pre", "post", "follow_up"),
+                                     levels = c("pre", "post", "follow_up"),
+                                     ordered = TRUE),
+                       Scale = factor(Scale,
+                                      ordered = TRUE),
+                       Scale = factor(Scale),
+                       MIDInote = factor(MIDInote),
+                       Ascend = factor(dplyr::if_else(Ascend == 1, 
+                                                      true = 1L, 
+                                                      false = 0L, 
+                                                      missing = NA_integer_)))
+```
 
+# Ergebnisse
+
+## Exploration
+
+### P01, P02, P03, P05
+
+```{r OverviewPlotIOIs, anchor=FIGREF}
+ggplot2::ggplot(mdata[mdata$ID != "P04", ], ggplot2::aes(IOI, color = Scale)) +
+  ggplot2::geom_density() +
+  ggplot2::facet_grid(rows = dplyr::vars(Day), cols = dplyr::vars(Time)) +
+  ggplot2::xlab("IOI (ms)")
+
+```
+
+`r kfigr::figr("OverviewPlotIOIs", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P01, P02, P03 und P05 gespielten Tonleitern, getrennt nach* Time *(pre, post, follow-up) und* Day *(d1, d8, d15 und d43).*
+
+***
+
+`r kfigr::figr("OverviewTabIOIs", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P01, P02, P03 und P05 nach Tag und Messzeitpunkt (in ms).*
+
+```{r OverviewTabIOIs, anchor=TABREF}
+knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ], 
+                                              Day, 
+                                              Time), 
+                              Min = min(IOI),
+                              Max = max(IOI),
+                              IQR = IQR(IOI),
+                              Median = median(IOI),
+                              Mean = mean(IOI),
+                              SD = sd(IOI)))
+```
+
+### P04
+
+
+```{r OverviewPlotIOIsP04, anchor=FIGREF}
+ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
+  ggplot2::geom_density() +
+  ggplot2::facet_grid(rows = dplyr::vars(Day), cols = dplyr::vars(Time)) +
+  ggplot2::xlab("IOI (ms)")
+```
+
+`r kfigr::figr("OverviewPlotIOIsP04", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P04 gespielten Tonleitern, getrennt nach* Time *(pre, post, follow-up) und* Day *(d1, d8, d15 und d43).*
+
+***
+
+`r kfigr::figr("OverviewTabIOIsP04", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P04 nach Tag und Messzeitpunkt (in ms).*
+
+```{r OverviewTabIOIsP04, anchor=TABREF}
+knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ], 
+                                              Day, 
+                                              Time), 
+                              Min = min(IOI),
+                              Max = max(IOI),
+                              IQR = IQR(IOI),
+                              Median = median(IOI),
+                              Mean = mean(IOI),
+                              SD = sd(IOI)))
+```
+
+```{r}
+SDs <- dplyr::summarize(dplyr::group_by(mdata,
+                                        ID, Day, Time, Scale),
+                        SD = sd(IOI))
+usethis::use_data(SDs)
+```
+
+### Anzahl gespielter Tonleitern
+
+Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festgelegt, da die Ausprägung der Dystonie mitbestimmt, wieviele fehlerfreie Tonleitern eines vorgegebenen Tempos jemand spielen kann. Zielgröße war 30 fehlerfreie Skalen, was auch alle TeilnehmerInnen außer P04 bei 120 bpm erreichten. Während der Messung trug die Experimentatorin mit einem gewissen "Sicherheitsabstand" bei jeder Bedingung dafür Sorge, dass, wenn irgend möglich, mindestens 30 Tonleitern gespielt wurden.
+
+```{r NumberOfScalesBoxPlot, anchor=FIGREF}
+n_scales <- dplyr::summarize(dplyr::group_by(SDs,
+                                             ID, Day, Time),
+                             N = max(as.numeric(levels(Scale))[Scale]))
+# n_scales_lng <- tidyr::pivot_wider(n_scales, 
+#                                    id_cols = N, 
+#                                    names_from = )
+ggplot2::ggplot(dplyr::group_by(n_scales,
+                                Day, Time), 
+                ggplot2::aes(Time, N)) +
+  ggplot2::geom_boxplot(outlier.colour = "white") +
+  ggplot2::geom_jitter(width = 0.05, color = "blue", alpha = 0.2) +
+  ggplot2::facet_grid(cols = dplyr::vars(Day)) +
+  ggplot2::ylab("Number of scales")
+```
+
+`r kfigr::figr("NumberOfScales", type = FIGREF)`. *Boxplots der Anzahl der von den fünf PatientInnen gespielten Tonleitern vor und nach der Intervention und bei Follow-up.*
+
+***
+
+```{r NumberOfScalesProfilePlot, anchor=FIGREF}
+ggplot2::ggplot(dplyr::group_by(n_scales,
+                                Day, Time), 
+                ggplot2::aes(Time, N, color = ID, linetype = ID,
+                             group = ID)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::facet_grid(cols = dplyr::vars(Day)) +
+  ggplot2::ylab("Number of scales")
+```
+
+`r kfigr::figr("NumberOfScalesProfilePlot", type = FIGREF)`. *Profilgraphen der Anzahl gespielter Tonleitern jedes/r PatientIn pro Bedingung.*
+
+***
+
+### Standardabweichung der IOIs
+
+Für die folgenden Analysen wurden die unterschiedlichen Spielgeschwindigkeiten (120 bzw. 100 bpm) ignoriert, da nicht die IOIs selber, sondern deren Standardabweichungen untersucht wurden. Auch diese sind zwar prinzipiell über die Formel
+
+$$s = \sqrt{\frac{1}{N-1} \sum_{i=1}^N (x_i - \bar{x})^2}$$
+
+vom Mittelwert (also den mittleren IOIs) abhängig, aber der Unterschied zwischen den beiden (nominellen) Mittelwerten 125 und 150 ms ist relativ klein und kann wahrscheinlich vernachlässigt werden.
+
+```{r OverviewPlotSDs, anchor=FIGREF}
+ggplot2::ggplot(SDs, ggplot2::aes(SD)) +
+  ggplot2::geom_density() +
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
+                      cols = dplyr::vars(Time)) +
+  ggplot2::xlab("Standard deviation of IOIs (ms)")
+```
+
+`r kfigr::figr("OverviewPlotSDs", type = FIGREF)`. *Dichtefunktionsschätzung der Standardabweichungen der Inter-onset Intervalle aller gespielten Tonleitern, getrennt nach* Time *(pre, post, follow-up) und* Day *(d1, d8, d15 und d43).*
+
+***
+
+Die rechtsschiefen Verteilungen der SDs in `r kfigr::figr("OverviewPlotSDs")` legen die Vermutung nahe, dass die log-Funktion als Link im GLM zum Einsatz kommen sollte. Zur visuellen Überprüfung zeigt `r kfigr::figr("OverviewPlotLogSDs", type = FIGREF)` die logarithmierten Daten aus `r kfigr::figr("OverviewPlotSDs")`.
+
+```{r OverviewPlotLogSDs, anchor=FIGREF}
+ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
+  ggplot2::geom_density() +
+  ggplot2::geom_rug() +
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
+                      cols = dplyr::vars(Time)) +
+  ggplot2::xlab("log(sd(IOI))")
+```
+
+Der Shapiro-Wilks-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`; @Razali2011] testet die Nullhypothese, dass eine Verteilung normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. 
+
+***
+
+`r kfigr::figr("ShapiroTab")`. *.*
+
+```{r ShapiroTab, anchor=TABREF}
+knitr::kable(dplyr::summarise(dplyr::group_by(SDs, 
+                                              ID, Day, Time),
+                              `p-value` = shapiro.test(SDs$SD)$p.value,
+                              N = dplyr::n()),
+             digits = 50)
+```
+
+Die sehr kleinen *p*-Werte sind ein starker Hinweis, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilks-Tests deutlich unterboten.
+
+Deshalb wird anstattdessen eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
+
+## Modellierung
+
+### Null-Modell
+
+```{r}
+(form_null <- brms::bf(SD ~ (1 | ID), 
+                       family = brms::skew_normal()))
+usethis::use_data(form_null,
+                  overwrite = TRUE)
+```
+
+```{r}
+priors_null <- brms::set_prior("normal(0, 1)",
+                              class = "sd")
+usethis::use_data(priors_null,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/null.R") 
+} 
+data(m_null)
+```
+
+
+# Literatur

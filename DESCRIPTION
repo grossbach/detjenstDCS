@@ -15,7 +15,11 @@ Suggests:
     ggplot2,
     kfigr,
     knitr,
+    patchwork,
     readxl,
-    rmarkdown
+    rmarkdown,
+    tidyr
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
+Depends: 
+    R (>= 2.10)
