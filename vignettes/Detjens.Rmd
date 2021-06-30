@@ -536,7 +536,10 @@ summary(m_Day_Time__1_ID,
 ```
 
 ```{r Day_Time__1_ID_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_Time__1_ID)
+p <- plot(brms::conditional_effects(m_Day_Time__1_ID),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_Time__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -585,7 +588,10 @@ summary(m_Day_Time_Ascend__1_ID,
 ```
 
 ```{r Day_Time_Ascend__1_ID_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_Time_Ascend__1_ID)
+p <- plot(brms::conditional_effects(m_Day_Time_Ascend__1_ID),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_Time_Ascend__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -635,7 +641,10 @@ summary(m_Day_Time_Ascend_Scale__1_ID,
 
 
 ```{r Day_Time_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_Time_Ascend_Scale__1_ID)
+p <- plot(brms::conditional_effects(m_Day_Time_Ascend_Scale__1_ID),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_Time_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -685,7 +694,10 @@ summary(m_Day_x_Time_Ascend_Scale__1_ID,
 
 
 ```{r Day_x_Time_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_x_Time_Ascend_Scale__1_ID)
+p <- plot(brms::conditional_effects(m_Day_x_Time_Ascend_Scale__1_ID),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_x_Time_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -735,7 +747,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID,
 
 
 ```{r Day_x_Time_x_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID)
+p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -791,7 +806,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
 
 
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day)
+p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day_),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -846,7 +864,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
 
 
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time)
+p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
@@ -902,7 +923,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
 
 
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot, anchor = FIGREF}
-brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
+p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend),
+          plot = FALSE)
+patchwork::wrap_plots(p) + 
+  patchwork::plot_annotation(tag_levels = "A")
 ```
 
 `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
