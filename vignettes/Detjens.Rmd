@@ -27,9 +27,8 @@ knitr::opts_knit$set(kfigr.link = TRUE,
 knitr::opts_chunk$set(comment = NULL,
                       echo = FALSE,
                       collapse = TRUE,
-                      fig.width = 3,
-                      fig.height = 3,
-                      fig.show = 'hold')
+                      fig.width = 7,
+                      fig.height = 5)
 ## rstan:
 options(mc.cores = parallel::detectCores(),
         digits = 3,
@@ -37,8 +36,6 @@ options(mc.cores = parallel::detectCores(),
 rstan::rstan_options(auto_write = TRUE)
 ## Constants:
 MODEL <- FALSE # Set to TRUE to run computationally costly models
-DO_IT <- FALSE # Set to TRUE to run simulation models
-DIAGN_PLOTS <- FALSE # Set to TRUE to show diagnostic plots
 FIGREF <- "Fig." # type for pics and plots, kfigr::figr()
 TABREF <- "Tab." # type for tables, kfigr::figr()
 PRIORREF <- "Prior" # type for priors, kfigr::figr()
@@ -90,7 +87,7 @@ if (interactive()) {
                                       ordered = TRUE, 
                                       labels = c("d1", "d8", "d15", "d43"),
                                       levels = c("d1", "d8", "d15", "d43")),
-                         Time = factor(Time, # Time deliberately not ordered, as for modelling 'foolow-up' needs
+                         Time = factor(Time, # Time deliberately not ordered, as for modelling, 'follow-up' needs
                                        labels = c("pre", "post", "follow_up"), # to be removed anyway
                                        levels = c("pre", "post", "follow_up")),
                          Scale = factor(Scale,
@@ -493,6 +490,10 @@ summary(m_Day__1_ID,
 brms::conditional_effects(m_Day__1_ID)
 ```
 
+`r kfigr::figr("Day__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
+
 ### Tag + Zeitpunkt + (1 | ID)
 
 ***
@@ -537,6 +538,10 @@ summary(m_Day_Time__1_ID,
 ```{r Day_Time__1_ID_CondPlot, anchor = FIGREF}
 brms::conditional_effects(m_Day_Time__1_ID)
 ```
+
+`r kfigr::figr("Day_Time__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
 
 ### Tag + Zeitpunkt + Aufwärts + (1 | ID)
 
@@ -583,6 +588,9 @@ summary(m_Day_Time_Ascend__1_ID,
 brms::conditional_effects(m_Day_Time_Ascend__1_ID)
 ```
 
+`r kfigr::figr("Day_Time_Ascend__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
 
 ### Tag + Zeitpunkt + Aufwärts + Skala + (1 | ID)
 
@@ -630,6 +638,10 @@ summary(m_Day_Time_Ascend_Scale__1_ID,
 brms::conditional_effects(m_Day_Time_Ascend_Scale__1_ID)
 ```
 
+`r kfigr::figr("Day_Time_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
+
 ### Tag x Zeitpunkt + Aufwärts + Skala + (1 | ID)
 
 ***
@@ -676,6 +688,10 @@ summary(m_Day_x_Time_Ascend_Scale__1_ID,
 brms::conditional_effects(m_Day_x_Time_Ascend_Scale__1_ID)
 ```
 
+`r kfigr::figr("Day_x_Time_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
+
 ### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID)
 
 ***
@@ -721,6 +737,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
 brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID)
 ```
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
 
 ### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)
 
@@ -774,6 +794,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
 brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day)
 ```
 
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
+
 ### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt)
 
 ***
@@ -824,6 +848,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot, anchor = FIGREF}
 brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time)
 ```
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
 
 ### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)
 
@@ -876,6 +904,10 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot, anchor = FIGREF}
 brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
 ```
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
+
+***
 
 ## Modell-Vergleich
 
