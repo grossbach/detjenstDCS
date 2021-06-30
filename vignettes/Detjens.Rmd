@@ -1,7 +1,11 @@
 ---
 title: "I. Detjens: tDCS bei dystonen PianistInnen"
+author: "Michael Großbach"
 date: "Draft `r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{I. Detjens: tDCS bei dystonen PianistInnen}
@@ -12,13 +16,7 @@ bibliography: /home/grossbach/files/_sonstiges/000literaturdb.bib
 csl: /home/grossbach/files/_sonstiges/frontiers-in-neuroscience.csl
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE,
-                      comment = NULL,
-                      echo = FALSE)
-```
-
-```{r setup}
+```{r setup, include=FALSE}
 library(detjenstDCS)
 ## ggplot2:
 ggplot2::theme_set(ggplot2::theme_light(base_size = 10))
@@ -28,9 +26,9 @@ knitr::opts_knit$set(kfigr.link = TRUE,
                      kfigr.prefix = TRUE)
 knitr::opts_chunk$set(comment = NULL,
                       echo = FALSE,
+                      collapse = TRUE,
                       fig.width = 7,
-                      fig.height = 5,
-                      cache = FALSE)
+                      fig.height = 5)
 ## rstan:
 options(mc.cores = parallel::detectCores(),
         digits = 3,
@@ -45,7 +43,11 @@ TABREF <- "Tab." # type for tables, kfigr::figr()
 PRIORREF <- "Prior" # type for priors, kfigr::figr()
 EQREF <- "Eq." # type for model equations, kfigr::figr()
 SRCREF <- "Src." # type for source code blocks, kfigr::figr()
-path_to_files <- "../../data"
+if (interactive()) {
+  path_to_files <- "../data"
+} else {
+  path_to_files <- "../../data"
+}
 ```
 
 # Methoden
@@ -71,33 +73,39 @@ fnames <- get_correct_fnames(relevant_fnames,
                              unique_days, 
                              tm,
                              status)
-mdata <- read_midi_data(fnames, path_to_files)
+if (interactive()) {
+  mdata <- read_midi_data(fnames, path_to_files)
+} else {
+  data(mdata)
+}
 ```
 
 ```{r PrepareData}
-mdata$Time[is.na(mdata$Time)] <- "follow_up" # set "Time" of follow-up measurements (arbitrarily) to pre
-mdata <- dplyr::mutate(mdata,
-                       ID = factor(ID),
-                       Day = factor(Day, 
-                                    ordered = TRUE, 
-                                    labels = c("d1", "d8", "d15", "d43"),
-                                    levels = c("d1", "d8", "d15", "d43")),
-                       Time = factor(Time,
-                                     labels = c("pre", "post", "follow_up"),
-                                     levels = c("pre", "post", "follow_up"),
-                                     ordered = TRUE),
-                       Scale = factor(Scale,
-                                      ordered = TRUE),
-                       Scale = factor(Scale),
-                       MIDInote = factor(MIDInote),
-                       Ascend = factor(dplyr::if_else(Ascend == 1, 
-                                                      true = 1L, 
-                                                      false = 0L, 
-                                                      missing = NA_integer_)))
+if (interactive()) {
+  mdata$Time[is.na(mdata$Time)] <- "follow_up" # set "Time" of follow-up measurements (arbitrarily) to pre
+  mdata <- dplyr::mutate(mdata,
+                         ID = factor(ID),
+                         Day = factor(Day, 
+                                      ordered = TRUE, 
+                                      labels = c("d1", "d8", "d15", "d43"),
+                                      levels = c("d1", "d8", "d15", "d43")),
+                         Time = factor(Time, # Time deliberately not ordered, as for modelling 'foolow-up' needs
+                                       labels = c("pre", "post", "follow_up"), # to be removed anyway
+                                       levels = c("pre", "post", "follow_up")),
+                         Scale = factor(Scale,
+                                        ordered = TRUE),
+                         MIDInote = factor(MIDInote),
+                         Ascend = factor(dplyr::if_else(Ascend == 1, 
+                                                        true = 1L, 
+                                                        false = 0L, 
+                                                        missing = NA_integer_)))
+  usethis::use_data(mdata,
+                    overwrite = TRUE)
+}
 ```
-
+  
 # Ergebnisse
-
+  
 ## Exploration
 
 ### P01, P02, P03, P05
@@ -114,7 +122,11 @@ ggplot2::ggplot(mdata[mdata$ID != "P04", ], ggplot2::aes(IOI, color = Scale)) +
 
 ***
 
-`r kfigr::figr("OverviewTabIOIs", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P01, P02, P03 und P05 nach Tag und Messzeitpunkt (in ms).*
+Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlotIOIs")`) sind zunächst erwartungsgemäß spitzer als normal und rechtsschief. Am ersten Tag sind die Verteilungen der gegen Ende des Durchgangs gespielten Tonleitern (hellgrüne bis gelbe Linien) flacher und breiter als früher gespilte Tonleitern (blaue bis dunkelgrüne Linien). Das ist ein Hinweis auf eine Korrelation von laufender Tonleiterzahl und Streubreite der IOIs und könnte von zunehmender Ermüdung der PatientInnen herrühren. Ein Blick auf `r kfigr::figr("OverviewTabIOIs", type = TABREF)` zeigt aber, dass in dieser ersten Bedingung besonders viele Tonleitern gespielt wurden, weshalb in den anderen Bedingungen (abgesehen von d43, follow-up) keine gelben Kurven sichtbar sind. In der Follow-up-Bedingung ist diese Verbreiterung der Verteilungskurven bei späteren Tonleitern allerdings nicht sichtbar.
+
+***
+
+`r kfigr::figr("OverviewTabIOIs")`. *Lage- und Streuparameter der Inter-onset Intervalle von P01, P02, P03 und P05 nach Tag und Messzeitpunkt (in ms). Die Spalte* N *listet für jede Bedingung die Anzahl der in die Ermittlung der Statistiken eingeflossenen IOIs.*
 
 ```{r OverviewTabIOIs, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ], 
@@ -125,20 +137,28 @@ knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ],
                               IQR = IQR(IOI),
                               Median = median(IOI),
                               Mean = mean(IOI),
-                              SD = sd(IOI)))
+                              SD = sd(IOI),
+                              N = dplyr::n(),
+                              .groups = "drop_last"))
 ```
 
-### P04
+`r kfigr::figr("OverviewTabIOIs")` zeigt einige Interessante Eigenschaften des Datensatzes: 1. sind in der Spalte *Min* die Hälfte der Einträge einstellig, der Rest befindet sich im niedrigen zweistelligen Bereich, d.h. dass es extrem kurze Dauern zwischen aufeinanderfolgenden Tönen gab. Und zwar so kurz, dass einige dieser Töne psychophysisch eigentlich zeitlich gar nicht mehr zu trennen sein können. 2. zeigt die Spalte *Max*, dass es auch IOIs gab, die zeitlich mehr als das doppelte des nominellen IOI von der vorhergehenden Note entfernt waren, also eigentlich hätte zum Zeitpunkt ihres Anschlags schon die nächste Taste angeschlagen gewesen sein müssen. 3. ist in den Spalten *Mean* und *Median* zu sehen, dass die (rohen) Lageparameter alle deutlich und systematisch unterhalb des zu erwarteten IOIs von 125 ms liegen, die PatientInnen also alle zu schnell spielten. Am ehesten zu erklären wäre diese Diskrepanz durch eine fehlerhafte Metronomspur im MIDI-Sequencer. Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* ist erklärbar durch den Datenverlust bei PatientIn P05, nur am ersten Tag vor der Stimulation sind ca. 100 Tonleitern mehr gespielt worden als in den folgenden Bedingungen ohne Datenverluste.
 
+### P04
 
 ```{r OverviewPlotIOIsP04, anchor=FIGREF}
 ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
   ggplot2::geom_density() +
+  ggplot2::geom_rug() +
   ggplot2::facet_grid(rows = dplyr::vars(Day), cols = dplyr::vars(Time)) +
   ggplot2::xlab("IOI (ms)")
 ```
 
 `r kfigr::figr("OverviewPlotIOIsP04", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P04 gespielten Tonleitern, getrennt nach* Time *(pre, post, follow-up) und* Day *(d1, d8, d15 und d43).*
+
+***
+
+Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Verteilungen aufweisen. Allerdings wird auch deutlich, dass PatientInnen nach unterschiedlich vielen Tonleitern dieses Phänomen zeigen, und man deshalb zur genaueren Untersuchung die keweils letzten zehn oder 15 Tonleitern aller PatientInnen miteinander vergleichen müsste.
 
 ***
 
@@ -153,14 +173,24 @@ knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ],
                               IQR = IQR(IOI),
                               Median = median(IOI),
                               Mean = mean(IOI),
-                              SD = sd(IOI)))
+                              SD = sd(IOI),
+                              N = dplyr::n(),
+                              .groups = "drop_last"))
 ```
 
+Auch bei PatientIn P04 liegen Mittelwert und Median der IOIs sehr nahe bei 120 ms, was noch weniger zu ihrem nominellen IOI von 150 ms passt.
+
 ```{r}
-SDs <- dplyr::summarize(dplyr::group_by(mdata,
-                                        ID, Day, Time, Scale),
-                        SD = sd(IOI))
-usethis::use_data(SDs)
+if (interactive()) {
+  SDs <- dplyr::summarize(dplyr::group_by(mdata,
+                                          ID, Day, Time, Ascend, Scale),
+                          SD = sd(IOI),
+                          .groups = "drop_last")
+  usethis::use_data(SDs,
+                    overwrite = TRUE)
+} else {
+  data("SDs")
+}
 ```
 
 ### Anzahl gespielter Tonleitern
@@ -170,10 +200,8 @@ Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festg
 ```{r NumberOfScalesBoxPlot, anchor=FIGREF}
 n_scales <- dplyr::summarize(dplyr::group_by(SDs,
                                              ID, Day, Time),
-                             N = max(as.numeric(levels(Scale))[Scale]))
-# n_scales_lng <- tidyr::pivot_wider(n_scales, 
-#                                    id_cols = N, 
-#                                    names_from = )
+                             N = max(as.numeric(levels(Scale))[Scale]),
+                             .groups = "drop_last")
 ggplot2::ggplot(dplyr::group_by(n_scales,
                                 Day, Time), 
                 ggplot2::aes(Time, N)) +
@@ -187,7 +215,10 @@ ggplot2::ggplot(dplyr::group_by(n_scales,
 
 ***
 
-```{r NumberOfScalesProfilePlot, anchor=FIGREF}
+In `r kfigr::figr("NumberOfScales")` entspricht jeder der hellblauen Punkte einer/m PatientIn. An den Tagen d15 und d43 sind wegen des Datenverlustes bei P05 nur vier statt fünf Punkte gezeigt.
+
+
+```{r NumberOfScalesProfilePlot, anchor=FIGREF, message=FALSE}
 ggplot2::ggplot(dplyr::group_by(n_scales,
                                 Day, Time), 
                 ggplot2::aes(Time, N, color = ID, linetype = ID,
@@ -202,9 +233,13 @@ ggplot2::ggplot(dplyr::group_by(n_scales,
 
 ***
 
+In `r kfigr::figr("NumberOfScalesProfilePlot")` ist zu sehen, dass die überzähligen Tonleitern in der prä-Bedingung am ersten Tag (`r kfigr::figr("OverviewPlotIOIs")` alle von P01 stammten. 
+
+Wenn man von diesem ersten Ausreißer von P01 absieht, nimmt die Anzahl der fehlerfrei gespielten Tonleitern aller PatientInnen über die Zeit zu, bei manchen auch innerhalb eines Tages.
+
 ### Standardabweichung der IOIs
 
-Für die folgenden Analysen wurden die unterschiedlichen Spielgeschwindigkeiten (120 bzw. 100 bpm) ignoriert, da nicht die IOIs selber, sondern deren Standardabweichungen untersucht wurden. Auch diese sind zwar prinzipiell über die Formel
+Für die folgenden Analysen wurden die unterschiedlichen Spielgeschwindigkeiten (120 bzw. 100 bpm) ignoriert, da nicht die IOIs selber, sondern deren Standardabweichungen (SD) untersucht wurden. Auch diese sind zwar prinzipiell über die Formel
 
 $$s = \sqrt{\frac{1}{N-1} \sum_{i=1}^N (x_i - \bar{x})^2}$$
 
@@ -233,41 +268,148 @@ ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
   ggplot2::xlab("log(sd(IOI))")
 ```
 
-Der Shapiro-Wilks-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`; @Razali2011] testet die Nullhypothese, dass eine Verteilung normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. 
+Der Shapiro-Wilks-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
 
 ***
 
-`r kfigr::figr("ShapiroTab")`. *.*
+`r kfigr::figr("ShapiroTab")`. *Ergebnisse des Shapiro-Wilks-Tests für die Verteilung der SD-Werte jedes/r PatientIn in allen Bedingungen. Die Spalte* N *enthält die Anzahl der fehlerfreien Tonleitern jedes/r TeilnehmerIn in der jeweiligen Bedingung.*
 
 ```{r ShapiroTab, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(SDs, 
                                               ID, Day, Time),
                               `p-value` = shapiro.test(SDs$SD)$p.value,
-                              N = dplyr::n()),
+                              N = dplyr::n(),
+                              .groups = "drop_last"),
              digits = 50)
 ```
 
-Die sehr kleinen *p*-Werte sind ein starker Hinweis, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilks-Tests deutlich unterboten.
+Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilks-Tests deutlich unterboten.
 
 Deshalb wird anstattdessen eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
 
 ## Modellierung
 
+Modellierung von Daten ist ein iterativer Prozess, der die vorliegenden Daten zunächst mit einem unstrukturierten Modell zu erklären versucht. Unstrukturiert heißt hier lediglich, dass kein durch Gruppierung und/oder Interventionen strukturierter, Daten-generierender Prozess angenommen wird, sondern dass die Daten nur durch die Variation zwischen den Individuen erklärbar sind. 
+
+Im nächsten Schritt wird häufig ein Populationseffekt (oft auch Fester Effekt genannt) hinzungefügt, wie z.B. ein Gruppierungsfaktor. In einem anschließenden Modellierungsschritt fügt man eventuelle Interaktionen zwischen Haupteffekten hinzu, sodann können noch eine weitere Kovariate zum Modell hinzugefügt werden. Schließlich folgen eventuelle Gruppen-spezifische Effekte, sogenannte variierende Interzepte und Steigungen, bis das Modell schließlich "komplett" ist.
+
+Das "komplette" Modell ist ein theoretisch sinnvolles Modell und beschreibt möglichst vollständig den Daten-generierenden Prozess, wie wir ihn uns vorstellen. Die Vorstellung über diesen Prozess speist sich aus der Theorie, also der vorliegenden Literatur und eigenen, daraus aufbauenden Ideen. Dementsprechend muss vor der Datenerhebung genau feststehen, wie die Daten analysiert werden sollen, damit auch alle zur Modellierung notwendigen Kovariaten erhoben werden können.
+
+Am Ende der Modellierung steht immer der Vergleich der verschiedenen Modelle, um entscheiden zu können, welches dasjenige ist, das die Daten am besten erklärt. Da komplexere Modelle die Daten immer besser erklären als einfachere Modelle, wird beim Vergleichen eine Strafe erteilt, die umso größer ist, je komplexer ein Modell ist. Das hat zur Folge, dass es einen Kompromiss gibt aus Erklärungsgüte und Modellkomplexität. Würde man diesen Kompromiss nicht eingehen, würde immer das komplexeste Modell "gewinnen". Da aber immer noch komplexere Modelle denkbar sind, würde man unglaublich komplexe Modelle bauen, die aber den Gedanken des Modells ad absurdum führen, nämlich dass ein Modell eine handhabbare, vereinfachende Erklärung eines komplexen Zusammenhangs darstellt. Oder man würde eine willkürliche Stoppregel einführen ("kein Modell darf mehr als fünf erklärende Variablen haben"). Beide Vorgehensweisen würden aber beim Erkenntnisgewinn nicht helfen, da ersteres nicht beim Erklären und Verstehen hilft und letzteres möglicherweise immer noch zu komplex ist, oder eben nicht komplex genug, um die Daten hinreichend zu erklären.
+
+Die theoretisch motivierten Quellen von Varianz, die durch ein komplettes Modell aufgeklärt werden sollten, sind für den vorliegenden Fall in `r kfigr::figr("CompleteModelTab", type = TABREF)` aufgeführt.
+
+***
+
+```{r CompleteModelTab, anchor=TABREF}
+# chunk intentionally left blank
+```
+
+`r kfigr::figr("CompleteModelTab")`. *Die bekannten Varianzquellen im vorliegenden Versuchsdesign.*
+
+---------------------------------------------------------------------------------------------------------------------
+Effektklasse              Effekt                    Bedeutung                       Bemerkungen
+-------------------       ------------------------  ----------------------------    ---------------------------------
+Populationseffekte        Interzept                 Schätzt mittlere *SD* am        Dies' ist die Referenz-
+                                                    <u>ersten</u> Tag <u>vor</u>    Bedingungskombination; 
+                                                    der Intervention bei            alle anderen Schätzwerte
+                                                    <u>Abwärts</u>spielrichtung     stellen Differenzen zu
+                                                    in der <u>ersten</u> Tonleiter  dieser Referenz dar
+
+                          Tag                       Schätzt Unterschied zu          Wenn es einen tDCS-
+                                                    'Interzept' am <u>zweiten</u>,  Effekt gibt, der eine
+                                                    <u>dritten</u> und              Woche überdauert, dann 
+                                                    <u>vierten</u> Tag              sollte der Schätzer $\neq$
+                                                                                    0 sein
+
+                          Zeitpunkt                 Schätzt Unterschied zu          Wenn es einen 
+                                                    'Interzept' <u>nach</u> der     unmittelbaren 
+                                                    Intervention                    Stimulationseffekt gibt, sollte
+                                                                                    dieser Schätzer ebenfalls $\neq$ 
+                                                                                    0 sein
+                          
+                          Spielrichtung             Schätzt *SD*-Unterschied zu     etc. pp.
+                                                    'Interzept' bei 
+                                                    <u>Aufwärts</u>spielrichtung
+                          
+                          fortlauf. Skalennummer    Unterschiede bei *SD* zu 
+                                                    'Interzept' in den weiteren 
+                                                    Tonleitern
+
+Gruppeneffekte            Individuum                Je ein Interzept für jedes 
+                                                    Individuum, also die 
+                                                    individuelle *SD* am 
+                                                    <u>ersten</u> Tag <u>vor</u> 
+                                                    der Intervention bei
+                                                    <u>Abwärts</u>spielrichtung 
+                                                    in der <u>ersten</u> 
+                                                    Tonleiter
+
+                          Tag                       Jedes Individuum erhält ein 
+                                                    variierendes Interzept für 
+                                                    'Tag'
+                          
+                          Zeitpunkt                 Jedes Individuum erhält ein 
+                                                    variierendes Interzept für 
+                                                    'Zeitpunkt'
+                          
+                          Spielrichtung             Jedes Individuum erhält ein 
+                                                    variierendes Interzept für 
+                                                    'Spielrichtung'
+                          
+                          fortlauf. Skalennummer    Jedes Individuum erhält ein 
+                                                    variierendes Interzept für 
+                                                    'Skalennummer'
+---------------------------------------------------------------------------------------------------------------------
+
+Die Populationseffekte sind hier nicht nur einfache Eingabevariablen, sondern auch als Interaktionen im kompletten Modell enthalten, so dass (theoretisch) an verschiedenen Messtagen unterschiedliche Steigungen z.B. für vor und nach der Intervention möglich sind. Damit Interaktionen stabil geschätzt werden können, sind sehr viel größere Stichproben erforderlich, als für einfache Effektschätzer. Die vorliegenden Daten von fünf PatientInnen werden deshalb keine sinnvollen Interaktionseffekte schätzbar machen. Umso wichtiger sind deshalb die Gruppen-Interzepte für *Individuum*, *Messtag*, *Messzeitpunkt*, *Spielrichtung* und *Skalennummer*.
+
+Das komplette Modell soll mit den Variablen *Messtag*, *Messzeitpunkt*, *Spielrichtung* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen d1 bis d15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Messzeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels (Tab. 1 in @Jabusch2004)); sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Spielrichtung* ebenfalls ein Wert $\neq$ 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters Tonleiternummer Rechnung getragen wird.
+
+Der Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Messtag und Messzeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse kann hinterher aber mit den Rohwerten der mittleren SDs im Follow-up vergleichen werden.
+
+```{r, message=FALSE}
+SDs_reduced <- dplyr::filter(SDs,
+                             Day != "d43")
+SDs_reduced <- dplyr::mutate(SDs_reduced,
+                             Scale = as.numeric(levels(Scale))[Scale])
+usethis::use_data(SDs_reduced,
+                  overwrite = TRUE)
+```
+
 ### Null-Modell
 
-```{r}
-(form_null <- brms::bf(SD ~ (1 | ID), 
+Das Null-Modell schätzt den Mittelwert der Standardabweichungen über alle PatientInnen, Tage, Messzeitpunkte, Spielrichtungen und Skalen und nimmt als Datenstruktur nur an, dass es Wiederholungsmessungen gibt, jedes Individuum also mehr als einmal gemssen wurde. Links der Tilde (`r kfigr::figr("form_null", type = EQREF)`) steht die zu erklärende Variable, hier die individuelle Variation *SD* um den nominellen *IOI*. Die Tilde wird gelesen als "wird erklärt durch". Dann folgt die rechte Seite der Gleichung: Sie besteht in diesem Modell nur aus zwei Termen, nämlich einer `1` und `(1 | ID)`. Die `1` bedeutet, dass das Modell ein Interzept schätzen soll, also den Punkt, wo die Regressionsgerade die Y-Achse schneidet, wo also gilt: $x = 0$. Wenn die Regressionsgleichung keine weiteren Populationparameter enthält, wird keine Steigung geschätzt; diese wird also als Null angenommen und verläuft waagerecht. Damit entspricht bei diesem Modell das Interzept dem Mittelwert über alle Standardabweichungen. Der geklammerte Term ist die Anweisung, für jedes Individuum (`ID`) ein Interzept zu schätzen und kennzeichnet gleichzeitig alle Werte von *SD*, die von ein und demselben Individuum *ID* stammen, als statistisch voneinander abhängig. Bei geklammerten Termen handelt es sich immer um gruppenspezifische Parameter (manchmal zufällige Effekte genannt). Bei der Schätzung von Populationseffekten in einem Modell ohne Gruppenparameter tragen alle Individuen gleichviel zur Schätzung der Parameter bei. Ein gemischtes Modell, wie hier dem Null-Modell, bei dem sowohl Populationsparameter (hier das Interzept) als auch Gruppenparameter (hier die individuellen Interzepte) geschätzt werden, gewichtet weit vom Populationsparameter entfernte Gruppenparameter weniger stark als solche, die näher am Populationsparameter gelegen sind. 
+
+Das Schätzen Gruppen-spezifischer Effekte verbessert die Qualität der Populationsparameter-Schätzung, da erstere gewichtet werden, um letztere zu schätzen. Gruppenparameter, deren Schätzwert weit vom Populationsschätzer entfernt liegen, werden weniger stark gewichtet als solche, die in der Nähe liegen. Wenn dann die Gruppenschätzer gewichtet gemittelt werden, ist der resultierende Populationsschätzer weniger von extremen Werten beeinflusst und deshalb meist stabiler oder "replizierbarer" als der ungewichtet ermittelte Populationsschätzer.
+
+***
+
+`r kfigr::figr("form_null")`. *Modell-Formel des Null-Modells.*
+
+```{r form_null, anchor=EQREF, message=FALSE}
+(form_null <- brms::bf(SD ~ 1 + (1 | ID), 
                        family = brms::skew_normal()))
 usethis::use_data(form_null,
                   overwrite = TRUE)
 ```
 
-```{r}
-priors_null <- brms::set_prior("normal(0, 1)",
-                              class = "sd")
+Die im Folgenden verwendeten Bayes'schen statistischen Modelle liefern ohne weitere "Zutaten" bereits Ergebnisse. Sie unterscheiden sich für NutzerInnen bis hierhin nicht von den klassischen hierarchischen Maximum-Likelihood-Modellen. Weiterhin gilt für beide  Modellierungsparadigmen, dass komplexe Modellformeln häufig dazu führen, dass die Modellierungsalgorithmen nicht konvergieren, die Berechnungen also abbrechen, oder Ergebnisse nicht reliabel sind. Im Bayes'schen Kontext können deshalb für jeden zu schätzenden Parameter sogennante Priors bestimmt werden. Diese Priors sind Wahrscheinlichkeitsdichteverteilungen für den jeweiligen Parameter. Sollen also die aktuellen unterschiedlichen Größen von Frauen und Männern in der Gesamtpopulation so genau wie möglich aus neuen Daten geschätzt werden, und es ist bekannt, dass bei der letzten Erhebung die Durchschnittsgröße der Männer vor zehn Jahren bei 176 cm lag ($\pm$ 7,37 cm), dann würde die Prior für das Interzept eine bei 176 cm zentrierte Normalverteilung mit einer Standardabweichung von 7,37 gewählt. Frauen waren zu dem Zeitpunkt mit durchschnittlich 164 cm im Mittel 6 cm kleiner ($\pm$ 10.1). Die Prior für die erklärende Variable *Frau* würde deshalb eine Normalverteilung $\cal{N}(6, 10.1)$ sein.
+
+Das hier zur Modellierung verwendete $\text{R}$-Paket brms [@Buerkner2017;@Buerkner2018] verwendet in der aktuellen Version (2.15.0) für Populationseffekte (außer dem Interzept) keine Priors (diese können aber händisch gesetzt werden). Variierende Interzepte erhalten automatisch eine $\cal{student\text{_}t}(3, 0, s)$-verteilte Prior. Diese muss bei kleinen Stichproben und/oder sehr großer Variation strenger sein, damit das Modell konvergieren kann, weshalb hier eine um Null zentrierte Normalverteilung mit einer Standardabweichung von 1 zum Einsatz kommt (`r kfigr::figr("priors_null", type = PRIORREF)`). 
+
+***
+
+`r kfigr::figr("priors_null")`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_null, anchor=PRIORREF, message=FALSE}
+(priors_null <- brms::set_prior("normal(0, 1)",
+                                class = "sd"))
 usethis::use_data(priors_null,
                   overwrite = TRUE)
 ```
+
+Die Gesamtheit der Priors dieses Modells wird im Zuge der Ergebniserklärungen besprochen.
 
 ```{r}
 if (MODEL) {
@@ -276,5 +418,225 @@ if (MODEL) {
 data(m_null)
 ```
 
+***
+
+`r kfigr::figr("null_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r null_summary, anchor=TABREF}
+summary(m_null, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+Die tabellarische Zusammenfassung der Modellierungsergebnisse in `r kfigr::figr("null_summary")` wiederholt zunächst die relevanten Modellierungseinstellungen. So sind die SD-Daten als normal-schief (*Family: skew_normal*) mit den zugehörigen Link-Funktionen angepasst worden. Der Parameter $\mu$ (*mu*) stellt den geschätzten Mittelwert dar, die Standardabweichung ($\sigma$, *sigma*) fängt die nicht vom Modell erklärte Variation der Daten auf, und $\alpha$ (*alpha*) schätzt die Schiefe der Normalverteilung.
+
+Im Abschnitt *Priors* sind alle Priors aufgeführt, die beim Modellieren verwendet wurden, sowohl die automatisch von brms gewählten als auch die händisch gesetzten (`r kfigr::figr("priors_null")`).
+
+Die eigentlichen Ergebnisse sind in den Abschnitten *Group-Level Effects* und *Population-Level Effects* aufgeführt. Gruppenspezifische Effekte wurden nur für die Gruppe `ID` geschätzt, die mittlere Standarabweichung der Interzepte betrug 2.18 ($\pm$ 0.45) ms. Das Populationsinterzept wurde auf 19.04 ($\pm$ 1.01) ms geschätzt, also deutlich über der von @Jabusch2004 ermittelten Schwelle zu dystonem Spiel.
+
+Der Abschnitt zu *Family Specific Parameters* listet die verteilungsspezifischen Parameter auf und wird bis auf Weiteres ignoriert.
+
+```{r null_DiagnPlot, anchor=FIGREF}
+plot(m_null, 
+     ask = FALSE)
+```
+
+`r kfigr::figr("null_DiagnPlot", type = FIGREF)`. *Diagnostik-Graphik.*
+
+***
+
+Die posterioren Verteilungen der Parameter-Schätzer in der linken Spalte von `r kfigr::figr("null_DiagnPlot")` verdeutlichen, dass Bayes'sche Modelle keine Punktschätzer liefern, wie in der traditionellen Frequentisten-Statistik ("Die SD der PatientInnen betrug im Mittel 19.04 ms $\pm$ 1.01"), sondern Wahrscheinlichkeitsverteilungen, die ihren Mittelwert bei z.B. 19.04 ms hatte; die Streubreite dieser Wahrscheinlichkeitsverteilung betrug 1.01 ms. Das bedeutet, dass nicht behauptet wird, dass ein Mittelwert (19.04 ms) mit einer gewissen (Un-)Sicherheit (1.01 ms) bestimmt worden ist, sondern dass der wahre Wert mit größerer Wahrscheinlichkeit im zentralen als im peripheren Bereich einer $\cal{N}(19.04, 1.01)$-Verteilung liegt.
+
+### Tag + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day__1_ID, anchor=EQREF, message=FALSE}
+(form_Day__1_ID <- brms::bf(SD ~ 1 + Day +
+                              (1 | ID), 
+                       family = brms::skew_normal()))
+usethis::use_data(form_Day__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day__1_ID <- priors_null)
+usethis::use_data(priors_Day__1_ID,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day__1_ID.R") 
+} 
+data(m_Day__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day__1_ID_summary, anchor=TABREF}
+summary(m_Day__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+```{r Day__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day__1_ID)
+```
+
+### Tag + Time + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day_Time__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_Time__1_ID, anchor=EQREF, message=FALSE}
+(form_Day_Time__1_ID <- brms::bf(SD ~ 1 + Day + Time +
+                              (1 | ID), 
+                       family = brms::skew_normal()))
+usethis::use_data(form_Day_Time__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_Time__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_Time__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day_Time__1_ID <- priors_Day__1_ID)
+usethis::use_data(priors_Day_Time__1_ID,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time__1_ID.R") 
+} 
+data(m_Day_Time__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day_Time__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_Time__1_ID_summary, anchor=TABREF}
+summary(m_Day_Time__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+```{r Day_Time__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_Time__1_ID)
+```
+
+### Tag + Time + Ascend + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day_Time_Ascend__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_Time_Ascend__1_ID, anchor=EQREF, message=FALSE}
+(form_Day_Time_Ascend__1_ID <- brms::bf(SD ~ 1 + Day + Time + Ascend +
+                              (1 | ID), 
+                       family = brms::skew_normal()))
+usethis::use_data(form_Day_Time_Ascend__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_Time_Ascend__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_Time_Ascend__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day_Time_Ascend__1_ID <- priors_Day_Time__1_ID)
+usethis::use_data(priors_Day_Time_Ascend__1_ID,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time_Ascend__1_ID.R") 
+} 
+data(m_Day_Time_Ascend__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day_Time_Ascend__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_Time_Ascend__1_ID_summary, anchor=TABREF}
+summary(m_Day_Time_Ascend__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+```{r Day_Time_Ascend__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_Time_Ascend__1_ID)
+```
+
+
+### Tag + Time + Ascend + Scale + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day_Time_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_Time_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
+(form_Day_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 1 + Day + Time + Ascend + Scale +
+                                                (1 | ID), 
+                                              family = brms::skew_normal()))
+usethis::use_data(form_Day_Time_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_Time_Ascend_Scale__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_Time_Ascend_Scale__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day_Time_Ascend_Scale__1_ID <- priors_Day_Time_Ascend__1_ID)
+usethis::use_data(priors_Day_Time_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time_Ascend_Scale__1_ID.R") 
+} 
+data(m_Day_Time_Ascend_Scale__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day_Time_Ascend_Scale__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_Time_Ascend_Scale__1_ID_summary, anchor=TABREF}
+summary(m_Day_Time_Ascend_Scale__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_Time_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_Time_Ascend_Scale__1_ID)
+```
+
+## Modell-Vergleich
+
+```{r}
+brms::loo_compare(m_null,
+                  m_Day__1_ID,
+                  m_Day_Time__1_ID,
+                  m_Day_Time_Ascend__1_ID,
+                  m_Day_Time_Ascend_Scale__1_ID)
+```
 
 # Literatur

@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 man/
+data/
 inst/doc

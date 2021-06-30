@@ -1,14 +1,14 @@
 rstan::rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 t <- Sys.time()
-load("../data/SDs.rda")
+load("../data/SDs_reduced.rda")
 load("../data/form_null.rda")
 load("../data/priors_null.rda")
 
 # Modelling --------------------------------------------------------------------
 
 m_null <- brms::brm(form_null,
-                    data = SDs,
+                    data = SDs_reduced,
                     prior = priors_null,
                     # iter = 20000,
                     # warmup = 2000,
