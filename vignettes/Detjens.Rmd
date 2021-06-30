@@ -27,8 +27,9 @@ knitr::opts_knit$set(kfigr.link = TRUE,
 knitr::opts_chunk$set(comment = NULL,
                       echo = FALSE,
                       collapse = TRUE,
-                      fig.width = 7,
-                      fig.height = 5)
+                      fig.width = 3,
+                      fig.height = 3,
+                      fig.show = 'hold')
 ## rstan:
 options(mc.cores = parallel::detectCores(),
         digits = 3,
@@ -126,7 +127,7 @@ Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlo
 
 ***
 
-`r kfigr::figr("OverviewTabIOIs")`. *Lage- und Streuparameter der Inter-onset Intervalle von P01, P02, P03 und P05 nach Tag und Messzeitpunkt (in ms). Die Spalte* N *listet für jede Bedingung die Anzahl der in die Ermittlung der Statistiken eingeflossenen IOIs.*
+`r kfigr::figr("OverviewTabIOIs")`. *Lage- und Streuparameter der Inter-onset Intervalle von P01, P02, P03 und P05 nach Tag und Zeitpunkt (in ms). Die Spalte* N *listet für jede Bedingung die Anzahl der in die Ermittlung der Statistiken eingeflossenen IOIs.*
 
 ```{r OverviewTabIOIs, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ], 
@@ -162,7 +163,7 @@ Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Ve
 
 ***
 
-`r kfigr::figr("OverviewTabIOIsP04", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P04 nach Tag und Messzeitpunkt (in ms).*
+`r kfigr::figr("OverviewTabIOIsP04", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P04 nach Tag und Zeitpunkt (in ms).*
 
 ```{r OverviewTabIOIsP04, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ], 
@@ -268,11 +269,11 @@ ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
   ggplot2::xlab("log(sd(IOI))")
 ```
 
-Der Shapiro-Wilks-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
+Der Shapiro-Wilk-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
 
 ***
 
-`r kfigr::figr("ShapiroTab")`. *Ergebnisse des Shapiro-Wilks-Tests für die Verteilung der SD-Werte jedes/r PatientIn in allen Bedingungen. Die Spalte* N *enthält die Anzahl der fehlerfreien Tonleitern jedes/r TeilnehmerIn in der jeweiligen Bedingung.*
+`r kfigr::figr("ShapiroTab")`. *Ergebnisse des Shapiro-Wilk-Tests für die Verteilung der SD-Werte jedes/r PatientIn in allen Bedingungen. Die Spalte* N *enthält die Anzahl der fehlerfreien Tonleitern jedes/r TeilnehmerIn in der jeweiligen Bedingung.*
 
 ```{r ShapiroTab, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(SDs, 
@@ -283,7 +284,7 @@ knitr::kable(dplyr::summarise(dplyr::group_by(SDs,
              digits = 50)
 ```
 
-Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilks-Tests deutlich unterboten.
+Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
 
 Deshalb wird anstattdessen eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
 
@@ -328,7 +329,7 @@ Populationseffekte        Interzept                 Schätzt mittlere *SD* am   
                                                                                     dieser Schätzer ebenfalls $\neq$ 
                                                                                     0 sein
                           
-                          Spielrichtung             Schätzt *SD*-Unterschied zu     etc. pp.
+                          Aufwärts                  Schätzt *SD*-Unterschied zu     etc. pp.
                                                     'Interzept' bei 
                                                     <u>Aufwärts</u>spielrichtung
                           
@@ -353,20 +354,20 @@ Gruppeneffekte            Individuum                Je ein Interzept für jedes
                                                     variierendes Interzept für 
                                                     'Zeitpunkt'
                           
-                          Spielrichtung             Jedes Individuum erhält ein 
+                          Aufwärts                  Jedes Individuum erhält ein 
                                                     variierendes Interzept für 
-                                                    'Spielrichtung'
+                                                    'Aufwärts'
                           
                           fortlauf. Skalennummer    Jedes Individuum erhält ein 
                                                     variierendes Interzept für 
                                                     'Skalennummer'
 ---------------------------------------------------------------------------------------------------------------------
 
-Die Populationseffekte sind hier nicht nur einfache Eingabevariablen, sondern auch als Interaktionen im kompletten Modell enthalten, so dass (theoretisch) an verschiedenen Messtagen unterschiedliche Steigungen z.B. für vor und nach der Intervention möglich sind. Damit Interaktionen stabil geschätzt werden können, sind sehr viel größere Stichproben erforderlich, als für einfache Effektschätzer. Die vorliegenden Daten von fünf PatientInnen werden deshalb keine sinnvollen Interaktionseffekte schätzbar machen. Umso wichtiger sind deshalb die Gruppen-Interzepte für *Individuum*, *Messtag*, *Messzeitpunkt*, *Spielrichtung* und *Skalennummer*.
+Die Populationseffekte sind hier nicht nur einfache Eingabevariablen, sondern auch als Interaktionen im kompletten Modell enthalten, so dass (theoretisch) an verschiedenen Tagen unterschiedliche Steigungen z.B. für vor und nach der Intervention möglich sind. Damit Interaktionen stabil geschätzt werden können, sind sehr viel größere Stichproben erforderlich, als für einfache Effektschätzer. Die vorliegenden Daten von fünf PatientInnen werden deshalb keine sinnvollen Interaktionseffekte schätzbar machen. Umso wichtiger sind deshalb die Gruppen-Interzepte für *Individuum*, *Tag*, *Zeitpunkt*, *Aufwärts* und *Skalennummer*.
 
-Das komplette Modell soll mit den Variablen *Messtag*, *Messzeitpunkt*, *Spielrichtung* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen d1 bis d15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Messzeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels (Tab. 1 in @Jabusch2004)); sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Spielrichtung* ebenfalls ein Wert $\neq$ 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters Tonleiternummer Rechnung getragen wird.
+Das komplette Modell soll mit den Variablen *Tag*, *Zeitpunkt*, *Aufwärts* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen d1 bis d15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Zeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels (Tab. 1 in @Jabusch2004)); sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Aufwärts* ebenfalls ein Wert $\neq$ 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters Tonleiternummer Rechnung getragen wird.
 
-Der Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Messtag und Messzeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse kann hinterher aber mit den Rohwerten der mittleren SDs im Follow-up vergleichen werden.
+Der Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Tag und Zeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse kann hinterher aber mit den Rohwerten der mittleren SDs im Follow-up vergleichen werden.
 
 ```{r, message=FALSE}
 SDs_reduced <- dplyr::filter(SDs,
@@ -379,7 +380,7 @@ usethis::use_data(SDs_reduced,
 
 ### Null-Modell
 
-Das Null-Modell schätzt den Mittelwert der Standardabweichungen über alle PatientInnen, Tage, Messzeitpunkte, Spielrichtungen und Skalen und nimmt als Datenstruktur nur an, dass es Wiederholungsmessungen gibt, jedes Individuum also mehr als einmal gemssen wurde. Links der Tilde (`r kfigr::figr("form_null", type = EQREF)`) steht die zu erklärende Variable, hier die individuelle Variation *SD* um den nominellen *IOI*. Die Tilde wird gelesen als "wird erklärt durch". Dann folgt die rechte Seite der Gleichung: Sie besteht in diesem Modell nur aus zwei Termen, nämlich einer `1` und `(1 | ID)`. Die `1` bedeutet, dass das Modell ein Interzept schätzen soll, also den Punkt, wo die Regressionsgerade die Y-Achse schneidet, wo also gilt: $x = 0$. Wenn die Regressionsgleichung keine weiteren Populationparameter enthält, wird keine Steigung geschätzt; diese wird also als Null angenommen und verläuft waagerecht. Damit entspricht bei diesem Modell das Interzept dem Mittelwert über alle Standardabweichungen. Der geklammerte Term ist die Anweisung, für jedes Individuum (`ID`) ein Interzept zu schätzen und kennzeichnet gleichzeitig alle Werte von *SD*, die von ein und demselben Individuum *ID* stammen, als statistisch voneinander abhängig. Bei geklammerten Termen handelt es sich immer um gruppenspezifische Parameter (manchmal zufällige Effekte genannt). Bei der Schätzung von Populationseffekten in einem Modell ohne Gruppenparameter tragen alle Individuen gleichviel zur Schätzung der Parameter bei. Ein gemischtes Modell, wie hier dem Null-Modell, bei dem sowohl Populationsparameter (hier das Interzept) als auch Gruppenparameter (hier die individuellen Interzepte) geschätzt werden, gewichtet weit vom Populationsparameter entfernte Gruppenparameter weniger stark als solche, die näher am Populationsparameter gelegen sind. 
+Das Null-Modell schätzt den Mittelwert der Standardabweichungen über alle PatientInnen, Tage, Zeitpunkte, Spielrichtungen und Skalen und nimmt als Datenstruktur nur an, dass es Wiederholungsmessungen gibt, jedes Individuum also mehr als einmal gemssen wurde. Links der Tilde (`r kfigr::figr("form_null", type = EQREF)`) steht die zu erklärende Variable, hier die individuelle Variation *SD* um den nominellen *IOI*. Die Tilde wird gelesen als "wird erklärt durch". Dann folgt die rechte Seite der Gleichung: Sie besteht in diesem Modell nur aus zwei Termen, nämlich einer `1` und `(1 | ID)`. Die `1` bedeutet, dass das Modell ein Interzept schätzen soll, also den Punkt, wo die Regressionsgerade die Y-Achse schneidet, wo also gilt: $x = 0$. Wenn die Regressionsgleichung keine weiteren Populationparameter enthält, wird keine Steigung geschätzt; diese wird also als Null angenommen und verläuft waagerecht. Damit entspricht bei diesem Modell das Interzept dem Mittelwert über alle Standardabweichungen. Der geklammerte Term ist die Anweisung, für jedes Individuum (`ID`) ein Interzept zu schätzen und kennzeichnet gleichzeitig alle Werte von *SD*, die von ein und demselben Individuum *ID* stammen, als statistisch voneinander abhängig. Bei geklammerten Termen handelt es sich immer um gruppenspezifische Parameter (manchmal zufällige Effekte genannt). Bei der Schätzung von Populationseffekten in einem Modell ohne Gruppenparameter tragen alle Individuen gleichviel zur Schätzung der Parameter bei. Ein gemischtes Modell, wie hier dem Null-Modell, bei dem sowohl Populationsparameter (hier das Interzept) als auch Gruppenparameter (hier die individuellen Interzepte) geschätzt werden, gewichtet weit vom Populationsparameter entfernte Gruppenparameter weniger stark als solche, die näher am Populationsparameter gelegen sind. 
 
 Das Schätzen Gruppen-spezifischer Effekte verbessert die Qualität der Populationsparameter-Schätzung, da erstere gewichtet werden, um letztere zu schätzen. Gruppenparameter, deren Schätzwert weit vom Populationsschätzer entfernt liegen, werden weniger stark gewichtet als solche, die in der Nähe liegen. Wenn dann die Gruppenschätzer gewichtet gemittelt werden, ist der resultierende Populationsschätzer weniger von extremen Werten beeinflusst und deshalb meist stabiler oder "replizierbarer" als der ungewichtet ermittelte Populationsschätzer.
 
@@ -492,7 +493,7 @@ summary(m_Day__1_ID,
 brms::conditional_effects(m_Day__1_ID)
 ```
 
-### Tag + Time + (1 | ID)
+### Tag + Zeitpunkt + (1 | ID)
 
 ***
 
@@ -537,7 +538,7 @@ summary(m_Day_Time__1_ID,
 brms::conditional_effects(m_Day_Time__1_ID)
 ```
 
-### Tag + Time + Ascend + (1 | ID)
+### Tag + Zeitpunkt + Aufwärts + (1 | ID)
 
 ***
 
@@ -583,7 +584,7 @@ brms::conditional_effects(m_Day_Time_Ascend__1_ID)
 ```
 
 
-### Tag + Time + Ascend + Scale + (1 | ID)
+### Tag + Zeitpunkt + Aufwärts + Skala + (1 | ID)
 
 ***
 
@@ -629,14 +630,274 @@ summary(m_Day_Time_Ascend_Scale__1_ID,
 brms::conditional_effects(m_Day_Time_Ascend_Scale__1_ID)
 ```
 
-## Modell-Vergleich
+### Tag x Zeitpunkt + Aufwärts + Skala + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day_x_Time_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_x_Time_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
+(form_Day_x_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 1 + Day * Time + Ascend + Scale +
+                                                (1 | ID), 
+                                              family = brms::skew_normal()))
+usethis::use_data(form_Day_x_Time_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_x_Time_Ascend_Scale__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_x_Time_Ascend_Scale__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day_x_Time_Ascend_Scale__1_ID <- priors_Day_Time_Ascend__1_ID)
+usethis::use_data(priors_Day_x_Time_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
 
 ```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_Ascend_Scale__1_ID.R") 
+} 
+data(m_Day_x_Time_Ascend_Scale__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day_x_Time_Ascend_Scale__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_x_Time_Ascend_Scale__1_ID_summary, anchor=TABREF}
+summary(m_Day_x_Time_Ascend_Scale__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_x_Time_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_x_Time_Ascend_Scale__1_ID)
+```
+
+### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID)
+
+***
+
+`r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_x_Time_x_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
+(form_Day_x_Time_x_Ascend_Scale__1_ID <- brms::bf(SD ~ 1 + Day * Time * Ascend + Scale +
+                                                (1 | ID), 
+                                              family = brms::skew_normal()))
+usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_x_Time_x_Ascend_Scale__1_ID", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_x_Time_x_Ascend_Scale__1_ID, anchor=PRIORREF, message=FALSE}
+(priors_Day_x_Time_x_Ascend_Scale__1_ID <- priors_Day_Time_Ascend__1_ID)
+usethis::use_data(priors_Day_x_Time_x_Ascend_Scale__1_ID,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID.R") 
+} 
+data(m_Day_x_Time_x_Ascend_Scale__1_ID)
+```
+
+***
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID_summary, anchor=TABREF}
+summary(m_Day_x_Time_x_Ascend_Scale__1_ID, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID)
+```
+
+### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)
+
+***
+
+`r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, anchor=EQREF, message=FALSE}
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day <- brms::bf(SD ~ 1 + Day * Time * Ascend + Scale +
+                                                    (1 | ID) +
+                                                    (1 | Day), 
+                                                  family = brms::skew_normal()))
+usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, anchor=PRIORREF, message=FALSE}
+(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day <- c(brms::set_prior("normal(0, 1)",
+                                                                    class = "sd", 
+                                                                    group = "ID"),
+                                                    brms::set_prior("normal(0, 0.5)",
+                                                                    class = "sd", 
+                                                                    group = "Day")))
+usethis::use_data(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day.R") 
+} 
+data(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day)
+```
+
+***
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_summary, anchor=TABREF}
+summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day)
+```
+
+### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt)
+
+***
+
+`r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time, anchor=EQREF, message=FALSE}
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time <- brms::bf(SD ~ 1 + Day * Time * Ascend + Scale +
+                                                                   (1 | ID) +
+                                                                   (1 | Day) +
+                                                                   (1 | Time), 
+                                                                 family = brms::skew_normal()))
+usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time, anchor=PRIORREF, message=FALSE}
+(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time <- c(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                                                            brms::set_prior("normal(0, 0.25)",
+                                                                            class = "sd", 
+                                                                            group = "Time")))
+usethis::use_data(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time.R") 
+} 
+data(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time)
+```
+
+***
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_summary, anchor=TABREF}
+summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time)
+```
+
+### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)
+
+***
+
+`r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend", type = FIGREF)`. *Modell-Formel des Modells.*
+
+```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend, anchor=EQREF, message=FALSE}
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend <- brms::bf(SD ~ 1 + Day * Time * Ascend + Scale +
+                                                                   (1 | ID) +
+                                                                   (1 | Day) +
+                                                                   (1 | Time) +
+                                                                   (1 | Ascend), 
+                                                                 family = brms::skew_normal()))
+usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
+                  overwrite = TRUE)
+```
+
+***
+
+`r kfigr::figr("priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend", type = TABREF)`. *Die händisch gesetzte Prior des Modells.*
+
+```{r priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend, anchor=PRIORREF, message=FALSE}
+(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend <- c(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
+                                                                      brms::set_prior("normal(0, 0.25)",
+                                                                                      class = "sd", 
+                                                                                      group = "Ascend")))
+usethis::use_data(priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
+                  overwrite = TRUE)
+```
+
+```{r}
+if (MODEL) {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend.R") 
+} 
+data(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
+```
+
+***
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_summary", type = TABREF)`. *Zusammenfassung der Ergebnisse des Modells.*
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_summary, anchor=TABREF}
+summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend, 
+        priors = TRUE, 
+        prob = 0.9)
+```
+
+
+```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot, anchor = FIGREF}
+brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
+```
+
+## Modell-Vergleich
+
+***
+
+`r kfigr::figr("ModelCompareTab", type = TABREF)`. *Vergleich der Modelle nach prädiktiver Genauigkeit.*
+
+```{r ModelCompareTab, anchor=TABREF}
 brms::loo_compare(m_null,
                   m_Day__1_ID,
                   m_Day_Time__1_ID,
                   m_Day_Time_Ascend__1_ID,
-                  m_Day_Time_Ascend_Scale__1_ID)
+                  m_Day_Time_Ascend_Scale__1_ID,
+                  m_Day_x_Time_Ascend_Scale__1_ID,
+                  m_Day_x_Time_x_Ascend_Scale__1_ID,
+                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
+                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
 ```
+
+`r kfigr::figr("ModelCompareTab")` zeigt, dass Model *Tag + Zeit + Aufwärts + Skala + (1_ID)* am besten abschneidet. Die Differenz zu den nachfolgenden Modellen ist aber angesichts des Standardfehlers der Differenzen vernachlässigbar, sodass sich die Interpretation auf das fast komplette Modell, *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit) + (1|Aufwärts)*, beschränkt.
+
+
 
 # Literatur
