@@ -806,7 +806,7 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
 
 
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot, anchor = FIGREF}
-p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day_),
+p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day),
           plot = FALSE)
 patchwork::wrap_plots(p) + 
   patchwork::plot_annotation(tag_levels = "A")
