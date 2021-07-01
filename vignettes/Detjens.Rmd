@@ -48,9 +48,9 @@ if (interactive()) {
 }
 ```
 
-# Methoden
+## Methoden
 
-Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) mit tDC stimuliert. Vorher (prä) und nachher (post) wurde die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d48). Bei PatientIn P05 fehlen die Daten von Tag 15 sowie die follow-up-Messung. 
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) dreimal mit tDC stimuliert. Vorher (prä) und nachher (post) wurde jedesmal die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d43). Bei PatientIn P05 fehlen die Daten von Tag 15 sowie die follow-up-Messung. 
 
 Alle PatientInnen außer P04 spielten die Tonleitern in Sechzehnteln zu einem auf 120 bpm eingestellten Metronom. Bei dieser Spielgeschwindigkeit dauert das nominelle Inter-onset Interval (IOI) `r 1000 / (120 * 4 / 60)` ms, bei 100 bpm (PatientIn P04) entsprechend `r 1000 / (100 * 4 / 60)` ms.
 
@@ -102,11 +102,11 @@ if (interactive()) {
 }
 ```
   
-# Ergebnisse
+## Ergebnisse
   
-## Exploration
+### Exploration
 
-### P01, P02, P03, P05
+#### P01, P02, P03, P05
 
 ```{r OverviewPlotIOIs, anchor=FIGREF}
 ggplot2::ggplot(mdata[mdata$ID != "P04", ], ggplot2::aes(IOI, color = Scale)) +
@@ -140,9 +140,11 @@ knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ],
                               .groups = "drop_last"))
 ```
 
-`r kfigr::figr("OverviewTabIOIs")` zeigt einige Interessante Eigenschaften des Datensatzes: 1. sind in der Spalte *Min* die Hälfte der Einträge einstellig, der Rest befindet sich im niedrigen zweistelligen Bereich, d.h. dass es extrem kurze Dauern zwischen aufeinanderfolgenden Tönen gab. Und zwar so kurz, dass einige dieser Töne psychophysisch eigentlich zeitlich gar nicht mehr zu trennen sein können. 2. zeigt die Spalte *Max*, dass es auch IOIs gab, die zeitlich mehr als das doppelte des nominellen IOI von der vorhergehenden Note entfernt waren, also eigentlich hätte zum Zeitpunkt ihres Anschlags schon die nächste Taste angeschlagen gewesen sein müssen. 3. ist in den Spalten *Mean* und *Median* zu sehen, dass die (rohen) Lageparameter alle deutlich und systematisch unterhalb des zu erwarteten IOIs von 125 ms liegen, die PatientInnen also alle zu schnell spielten. Am ehesten zu erklären wäre diese Diskrepanz durch eine fehlerhafte Metronomspur im MIDI-Sequencer. Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* ist erklärbar durch den Datenverlust bei PatientIn P05, nur am ersten Tag vor der Stimulation sind ca. 100 Tonleitern mehr gespielt worden als in den folgenden Bedingungen ohne Datenverluste.
+`r kfigr::figr("OverviewTabIOIs")` zeigt einige Interessante Eigenschaften des Datensatzes: 1. sind in der Spalte *Min* die Hälfte der Einträge einstellig, der Rest befindet sich im niedrigen zweistelligen Bereich, d.h. dass es extrem kurze Dauern zwischen aufeinanderfolgenden Tönen gab. Und zwar so kurz, dass einige dieser Töne psychophysisch eigentlich zeitlich gar nicht mehr zu trennen sein können. 2. zeigt die Spalte *Max*, dass es auch IOIs gab, die zeitlich mehr als das doppelte des nominellen IOI von der vorhergehenden Note entfernt waren, also eigentlich hätte zum Zeitpunkt ihres Anschlags schon die nächste Taste angeschlagen gewesen sein müssen. 3. ist in den Spalten *Mean* und *Median* zu sehen, dass die (rohen) Lageparameter alle deutlich und systematisch unterhalb des zu erwarteten IOIs von 125 ms liegen, die PatientInnen also alle zu schnell spielten. Am ehesten zu erklären wäre diese Diskrepanz durch eine fehlerhafte Metronomspur im MIDI-Sequencer.
 
-### P04
+Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* ist erklärbar durch den Datenverlust bei PatientIn P05, lediglich am ersten Tag vor der Stimulation sind ca. 130 Tonleitern mehr gespielt worden als in den folgenden Bedingungen ohne Datenverluste.
+
+#### P04
 
 ```{r OverviewPlotIOIsP04, anchor=FIGREF}
 ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
@@ -191,7 +193,7 @@ if (interactive()) {
 }
 ```
 
-### Anzahl gespielter Tonleitern
+#### Anzahl gespielter Tonleitern
 
 Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festgelegt, da die Ausprägung der Dystonie mitbestimmt, wieviele fehlerfreie Tonleitern eines vorgegebenen Tempos jemand spielen kann. Zielgröße war 30 fehlerfreie Skalen, was auch alle TeilnehmerInnen außer P04 bei 120 bpm erreichten. Während der Messung trug die Experimentatorin mit einem gewissen "Sicherheitsabstand" bei jeder Bedingung dafür Sorge, dass, wenn irgend möglich, mindestens 30 Tonleitern gespielt wurden.
 
@@ -235,7 +237,7 @@ In `r kfigr::figr("NumberOfScalesProfilePlot")` ist zu sehen, dass die überzäh
 
 Wenn man von diesem ersten Ausreißer von P01 absieht, nimmt die Anzahl der fehlerfrei gespielten Tonleitern aller PatientInnen über die Zeit zu, bei manchen auch innerhalb eines Tages.
 
-### Standardabweichung der IOIs
+#### Standardabweichung der IOIs
 
 Für die folgenden Analysen wurden die unterschiedlichen Spielgeschwindigkeiten (120 bzw. 100 bpm) ignoriert, da nicht die IOIs selber, sondern deren Standardabweichungen (SD) untersucht wurden. Auch diese sind zwar prinzipiell über die Formel
 
@@ -281,11 +283,11 @@ knitr::kable(dplyr::summarise(dplyr::group_by(SDs,
              digits = 50)
 ```
 
-Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von `0.05 / 3` = `r 0.05 / 3` wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
+Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von 0.05 / 3 = 0.017 wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
 
 Deshalb wird anstattdessen eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
 
-## Modellierung
+### Modellierung
 
 Modellierung von Daten ist ein iterativer Prozess, der die vorliegenden Daten zunächst mit einem unstrukturierten Modell zu erklären versucht. Unstrukturiert heißt hier lediglich, dass kein durch Gruppierung und/oder Interventionen strukturierter, Daten-generierender Prozess angenommen wird, sondern dass die Daten nur durch die Variation zwischen den Individuen erklärbar sind. 
 
@@ -364,7 +366,7 @@ Die Populationseffekte sind hier nicht nur einfache Eingabevariablen, sondern au
 
 Das komplette Modell soll mit den Variablen *Tag*, *Zeitpunkt*, *Aufwärts* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen d1 bis d15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Zeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels (Tab. 1 in @Jabusch2004)); sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Aufwärts* ebenfalls ein Wert $\neq$ 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters Tonleiternummer Rechnung getragen wird.
 
-Der Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Tag und Zeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse kann hinterher aber mit den Rohwerten der mittleren SDs im Follow-up vergleichen werden.
+Der Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Tag und Zeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse können hinterher aber mit den Rohwerten der mittleren SDs im Follow-up vergleichen werden.
 
 ```{r, message=FALSE}
 SDs_reduced <- dplyr::filter(SDs,
@@ -375,9 +377,11 @@ usethis::use_data(SDs_reduced,
                   overwrite = TRUE)
 ```
 
-### Null-Modell
+#### Null-Modell
 
-Das Null-Modell schätzt den Mittelwert der Standardabweichungen über alle PatientInnen, Tage, Zeitpunkte, Spielrichtungen und Skalen und nimmt als Datenstruktur nur an, dass es Wiederholungsmessungen gibt, jedes Individuum also mehr als einmal gemssen wurde. Links der Tilde (`r kfigr::figr("form_null", type = EQREF)`) steht die zu erklärende Variable, hier die individuelle Variation *SD* um den nominellen *IOI*. Die Tilde wird gelesen als "wird erklärt durch". Dann folgt die rechte Seite der Gleichung: Sie besteht in diesem Modell nur aus zwei Termen, nämlich einer `1` und `(1 | ID)`. Die `1` bedeutet, dass das Modell ein Interzept schätzen soll, also den Punkt, wo die Regressionsgerade die Y-Achse schneidet, wo also gilt: $x = 0$. Wenn die Regressionsgleichung keine weiteren Populationparameter enthält, wird keine Steigung geschätzt; diese wird also als Null angenommen und verläuft waagerecht. Damit entspricht bei diesem Modell das Interzept dem Mittelwert über alle Standardabweichungen. Der geklammerte Term ist die Anweisung, für jedes Individuum (`ID`) ein Interzept zu schätzen und kennzeichnet gleichzeitig alle Werte von *SD*, die von ein und demselben Individuum *ID* stammen, als statistisch voneinander abhängig. Bei geklammerten Termen handelt es sich immer um gruppenspezifische Parameter (manchmal zufällige Effekte genannt). Bei der Schätzung von Populationseffekten in einem Modell ohne Gruppenparameter tragen alle Individuen gleichviel zur Schätzung der Parameter bei. Ein gemischtes Modell, wie hier dem Null-Modell, bei dem sowohl Populationsparameter (hier das Interzept) als auch Gruppenparameter (hier die individuellen Interzepte) geschätzt werden, gewichtet weit vom Populationsparameter entfernte Gruppenparameter weniger stark als solche, die näher am Populationsparameter gelegen sind. 
+Das Null-Modell schätzt den Mittelwert der Standardabweichungen über alle PatientInnen, Tage, Zeitpunkte, Spielrichtungen und Skalen und nimmt als Datenstruktur nur an, dass es Wiederholungsmessungen gibt, jedes Individuum also mehr als einmal gemssen wurde. Links der Tilde (`r kfigr::figr("form_null", type = EQREF)`) steht die zu erklärende Variable, hier die individuelle Variation *SD* um den nominellen *IOI*. Die Tilde wird gelesen als "wird erklärt durch". Dann folgt die rechte Seite der Gleichung: Sie besteht in diesem Modell nur aus zwei Termen, nämlich einer `1` und `(1 | ID)`. Die `1` bedeutet, dass das Modell ein Interzept schätzen soll, also den Punkt, wo die Regressionsgerade die Y-Achse schneidet, wo also gilt: $x = 0$. Wenn die Regressionsgleichung keine weiteren Populationparameter enthält, wird keine Steigung geschätzt; diese wird deshalb als Null angenommen und verläuft dementsprechend waagerecht. Damit entspricht bei diesem Modell das Interzept dem Mittelwert über alle Standardabweichungen. Der geklammerte Term ist die Anweisung, für jedes Individuum (`ID`) ein Interzept zu schätzen und kennzeichnet gleichzeitig alle Werte von *SD*, die von ein und demselben Individuum *ID* stammen, als statistisch voneinander abhängig. Bei geklammerten Termen handelt es sich immer um gruppenspezifische Parameter (manchmal zufällige Effekte genannt).
+
+Bei der Schätzung von Populationseffekten in einem Modell ohne Gruppenparameter tragen alle Individuen gleichviel zur Schätzung der Parameter bei. Ein gemischtes Modell hingegen, wie dem vorliegenden Null-Modell, bei dem sowohl Populationsparameter (hier das Interzept) als auch Gruppenparameter (hier die individuellen Interzepte) geschätzt werden, gewichtet weit vom Populationsparameter entfernte Gruppenparameter weniger stark als solche, die näher am Populationsparameter gelegen sind. 
 
 Das Schätzen Gruppen-spezifischer Effekte verbessert die Qualität der Populationsparameter-Schätzung, da erstere gewichtet werden, um letztere zu schätzen. Gruppenparameter, deren Schätzwert weit vom Populationsschätzer entfernt liegen, werden weniger stark gewichtet als solche, die in der Nähe liegen. Wenn dann die Gruppenschätzer gewichtet gemittelt werden, ist der resultierende Populationsschätzer weniger von extremen Werten beeinflusst und deshalb meist stabiler oder "replizierbarer" als der ungewichtet ermittelte Populationsschätzer.
 
@@ -394,7 +398,7 @@ usethis::use_data(form_null,
 
 Die im Folgenden verwendeten Bayes'schen statistischen Modelle liefern ohne weitere "Zutaten" bereits Ergebnisse. Sie unterscheiden sich für NutzerInnen bis hierhin nicht von den klassischen hierarchischen Maximum-Likelihood-Modellen. Weiterhin gilt für beide  Modellierungsparadigmen, dass komplexe Modellformeln häufig dazu führen, dass die Modellierungsalgorithmen nicht konvergieren, die Berechnungen also abbrechen, oder Ergebnisse nicht reliabel sind. Im Bayes'schen Kontext können deshalb für jeden zu schätzenden Parameter sogennante Priors bestimmt werden. Diese Priors sind Wahrscheinlichkeitsdichteverteilungen für den jeweiligen Parameter. Sollen also die aktuellen unterschiedlichen Größen von Frauen und Männern in der Gesamtpopulation so genau wie möglich aus neuen Daten geschätzt werden, und es ist bekannt, dass bei der letzten Erhebung die Durchschnittsgröße der Männer vor zehn Jahren bei 176 cm lag ($\pm$ 7,37 cm), dann würde die Prior für das Interzept eine bei 176 cm zentrierte Normalverteilung mit einer Standardabweichung von 7,37 gewählt. Frauen waren zu dem Zeitpunkt mit durchschnittlich 164 cm im Mittel 6 cm kleiner ($\pm$ 10.1). Die Prior für die erklärende Variable *Frau* würde deshalb eine Normalverteilung $\cal{N}(6, 10.1)$ sein.
 
-Das hier zur Modellierung verwendete $\text{R}$-Paket brms [@Buerkner2017;@Buerkner2018] verwendet in der aktuellen Version (2.15.0) für Populationseffekte (außer dem Interzept) keine Priors (diese können aber händisch gesetzt werden). Variierende Interzepte erhalten automatisch eine $\cal{student\text{_}t}(3, 0, s)$-verteilte Prior. Diese muss bei kleinen Stichproben und/oder sehr großer Variation strenger sein, damit das Modell konvergieren kann, weshalb hier eine um Null zentrierte Normalverteilung mit einer Standardabweichung von 1 zum Einsatz kommt (`r kfigr::figr("priors_null", type = PRIORREF)`). 
+Das hier zur Modellierung verwendete $\text{R}$-Paket brms [@Buerkner2017;@Buerkner2018] verwendet in der aktuellen Version (2.15.0) für Populationseffekte (außer dem Interzept) keine Priors (diese können aber händisch gesetzt werden). Variierende Interzepte erhalten automatisch eine $\cal{student\text{_}t}(3, 0, s)$-verteilte Prior, wobei $s$ für die Standardabweichung der Normalverteilung steht. Diese Prior muss bei kleinen Stichproben und/oder sehr großer Variation strenger sein--$s$ muss also kleiner gewählt werden--, damit das Modell konvergieren kann, weshalb hier eine um Null zentrierte Normalverteilung mit einer Standardabweichung von 1 zum Einsatz kommt (`r kfigr::figr("priors_null", type = PRIORREF)`). 
 
 ***
 
@@ -443,9 +447,17 @@ plot(m_null,
 
 ***
 
-Die posterioren Verteilungen der Parameter-Schätzer in der linken Spalte von `r kfigr::figr("null_DiagnPlot")` verdeutlichen, dass Bayes'sche Modelle keine Punktschätzer liefern, wie in der traditionellen Frequentisten-Statistik ("Die SD der PatientInnen betrug im Mittel 19.04 ms $\pm$ 1.01"), sondern Wahrscheinlichkeitsverteilungen, die ihren Mittelwert bei z.B. 19.04 ms hatte; die Streubreite dieser Wahrscheinlichkeitsverteilung betrug 1.01 ms. Das bedeutet, dass nicht behauptet wird, dass ein Mittelwert (19.04 ms) mit einer gewissen (Un-)Sicherheit (1.01 ms) bestimmt worden ist, sondern dass der wahre Wert mit größerer Wahrscheinlichkeit im zentralen als im peripheren Bereich einer $\cal{N}(19.04, 1.01)$-Verteilung liegt.
+```{r}
+post_null <- brms::posterior_samples(m_null)
+Interzept_m <- round(mean(post_null$b_Intercept), 
+                     2)
+Interzept_sd <- round(sd(post_null$b_Intercept),
+                      2)
+```
 
-### Tag + (1 | ID)
+Die posterioren Verteilungen der Parameter-Schätzer in der linken Spalte von `r kfigr::figr("null_DiagnPlot")` verdeutlichen, dass Bayes'sche Modelle keine Punktschätzer liefern, wie in der traditionellen Frequentisten-Statistik ("Die SD der PatientInnen betrug im Mittel `r Interzept_m` ms $\pm$ `r Interzept_sd`"), sondern Wahrscheinlichkeitsverteilungen, die ihren Mittelwert bei z.B. `r Interzept_m` ms hatte; die Streubreite dieser Wahrscheinlichkeitsverteilung betrug `r Interzept_sd` ms. Das bedeutet, dass nicht behauptet wird, dass ein Mittelwert (`r Interzept_m` ms) mit einer gewissen (Un-)Sicherheit (`r Interzept_sd` ms) bestimmt worden ist, sondern dass der wahre Wert mit größerer Wahrscheinlichkeit im zentralen als im peripheren Bereich einer $\cal{N}($`r Interzept_m`, `r Interzept_sd`$)$-Verteilung liegt.
+
+#### Tag + (1 | ID)
 
 ***
 
@@ -494,7 +506,9 @@ brms::conditional_effects(m_Day__1_ID)
 
 ***
 
-### Tag + Zeitpunkt + (1 | ID)
+Es gibt anscheinend einen schwachen Tageseffekt (in der Vorher-Messung bei der ersten Abwärtstonleiter).
+
+#### Tag + Zeitpunkt + (1 | ID)
 
 ***
 
@@ -546,7 +560,9 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag + Zeitpunkt + Aufwärts + (1 | ID)
+Interessanterweise gibt es in diesem Modell (also am ersten Tag!) keinen Vorher-nacher-Effekt (in der ersten Abwärtstonleiter).
+
+#### Tag + Zeitpunkt + Aufwärts + (1 | ID)
 
 ***
 
@@ -598,7 +614,9 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag + Zeitpunkt + Aufwärts + Skala + (1 | ID)
+Am ersten Tag gab es in der Vorher-Messung einen "Effekt" der Spielrichtung in der ersten Tonleiter. Die PatientInnen waren also im Mittel in der Abwärtsrichtung stäker betroffen (die Standardabweichung war größer) als beim Aufwärtsspiel.
+
+#### Tag + Zeitpunkt + Aufwärts + Skala + (1 | ID)
 
 ***
 
@@ -651,7 +669,11 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag x Zeitpunkt + Aufwärts + Skala + (1 | ID)
+Im Mittel nahm die Standardabweichung im Verlauf einer Messung (hier: erster Tag, prae interventionem, erste Abwärtstonleiter) zu.
+
+#### Tag x Zeitpunkt + Aufwärts + Skala + (1 | ID)
+
+In diesem Abschnitt wird die erste Interaktion modelliert, sodass die Steigungen von *Zeitpunkt* für jeden Tag erittelt werden.
 
 ***
 
@@ -704,7 +726,11 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID)
+Wenig überraschend ist in `r kfigr::figr("Day_x_Time_Ascend_Scale__1_ID_CondPlot")`E kein bemerkenswerter Interaktionseffekt sichtbar.
+
+#### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID)
+
+Dieses Modell berücksichtigt zusätzlich die Interaktion von *Aufwärts* mit *Tag* und *Zeitpunkt*.
 
 ***
 
@@ -749,7 +775,12 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID),
           plot = FALSE)
-patchwork::wrap_plots(p) + 
+patchwork::wrap_plots(p, 
+                      design = "
+                      ABC
+                      D##
+                      EFG
+                      ") + 
   patchwork::plot_annotation(tag_levels = "A")
 ```
 
@@ -757,7 +788,11 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)
+Es gibt ebenfalls keine *Tag* x *Aufwärts*-Interaktion (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID_CondPlot")`F), aber eine zwischen *Zeitpunkt* und *Aufwärts* (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID_CondPlot")`G). 
+
+#### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)
+
+In diesem Modell wird zusätzlich ein variierendes Interzept für *Tag* modelliert.
 
 ***
 
@@ -808,7 +843,12 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day),
           plot = FALSE)
-patchwork::wrap_plots(p) + 
+patchwork::wrap_plots(p, 
+                      design = "
+                      ABC
+                      D##
+                      EFG
+                      ") + 
   patchwork::plot_annotation(tag_levels = "A")
 ```
 
@@ -816,7 +856,7 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt)
+#### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt)
 
 ***
 
@@ -866,7 +906,12 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time),
           plot = FALSE)
-patchwork::wrap_plots(p) + 
+patchwork::wrap_plots(p, 
+                      design = "
+                      ABC
+                      D##
+                      EFG
+                      ") + 
   patchwork::plot_annotation(tag_levels = "A")
 ```
 
@@ -874,7 +919,7 @@ patchwork::wrap_plots(p) +
 
 ***
 
-### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)
+#### Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)
 
 ***
 
@@ -925,15 +970,20 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend),
           plot = FALSE)
-patchwork::wrap_plots(p) + 
-  patchwork::plot_annotation(tag_levels = "A")
+patchwork::wrap_plots(p, 
+                      design = "
+                      ABC
+                      D##
+                      EFG
+                      ") + 
+  patchwork::plot_annotation(tag_levels = "A") 
 ```
 
 `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot", type = FIGREF)`. *Konditionalgraphen des Modells.*
 
 ***
 
-## Modell-Vergleich
+### Modell-Vergleich
 
 ***
 
@@ -952,8 +1002,14 @@ brms::loo_compare(m_null,
                   m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
 ```
 
-`r kfigr::figr("ModelCompareTab")` zeigt, dass Model *Tag + Zeit + Aufwärts + Skala + (1_ID)* am besten abschneidet. Die Differenz zu den nachfolgenden Modellen ist aber angesichts des Standardfehlers der Differenzen vernachlässigbar, sodass sich die Interpretation auf das fast komplette Modell, *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit) + (1|Aufwärts)*, beschränkt.
+`r kfigr::figr("ModelCompareTab")` zeigt, dass das Model *Tag + Zeit + Aufwärts + Skala + (1|ID)* am besten abschnitt. Die Differenz zu den nachfolgenden Modellen ist aber angesichts des Standardfehlers der Differenzen vernachlässigbar, sodass sich die Interpretation auf das fast komplette Modell, *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit) + (1|Aufwärts)*, beschränken sollte.
 
+### Modellierungsergebnisse
 
+Die Modellierungsergebnisse iḿ Abschnitt "[Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)]" zeigen, dass es in den vorliegenden Daten keinen Hinweis auf eine unmittelbare Wirkung der tDC-Stimulation gibt, da es an keinem der drei Stimulationstage Vorher-Nachher-Effekte zu geben scheint, aber es gibt eine leichte Verbesserung in der Spielunregelmäßigkeit zwischen dem ersten und dem zweiten Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`E). 
 
-# Literatur
+Diese leichten Verbesserungen scheint es über die drei Wochen nur bei den Aufwärtstonleitern zu geben; bei den Abwärtstonleitern gibt es lediglich eine leichte Verbesserung zwischen erstem und zweitem Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`F).
+
+Die Aufschlüsselung nach *Zeitpunkt* und *Aufwärts* zeigt schließlich (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`G), dass es eine divergente Entwicklung bei der Spielverbesserung gab.
+
+## Literatur
