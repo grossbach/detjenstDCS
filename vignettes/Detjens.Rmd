@@ -50,7 +50,7 @@ if (interactive()) {
 
 ## Methoden
 
-Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) dreimal mit tDC stimuliert. Vorher (prä) und nachher (post) wurde jedesmal die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d43). Bei PatientIn P05 fehlen die Daten von Tag 15 sowie die follow-up-Messung. 
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) dreimal mit tDC stimuliert. Vorher (prä) und nachher (post) wurde jedesmal die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d43). Bei PatientIn P05 fehlen die Daten von Tag 15.
 
 Alle PatientInnen außer P04 spielten die Tonleitern in Sechzehnteln zu einem auf 120 bpm eingestellten Metronom. Bei dieser Spielgeschwindigkeit dauert das nominelle Inter-onset Interval (IOI) `r 1000 / (120 * 4 / 60)` ms, bei 100 bpm (PatientIn P04) entsprechend `r 1000 / (100 * 4 / 60)` ms.
 
@@ -140,16 +140,16 @@ knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ],
                               .groups = "drop_last"))
 ```
 
-`r kfigr::figr("OverviewTabIOIs")` zeigt einige Interessante Eigenschaften des Datensatzes: 1. sind in der Spalte *Min* die Hälfte der Einträge einstellig, der Rest befindet sich im niedrigen zweistelligen Bereich, d.h. dass es extrem kurze Dauern zwischen aufeinanderfolgenden Tönen gab. Und zwar so kurz, dass einige dieser Töne psychophysisch eigentlich zeitlich gar nicht mehr zu trennen sein können. 2. zeigt die Spalte *Max*, dass es auch IOIs gab, die zeitlich mehr als das doppelte des nominellen IOI von der vorhergehenden Note entfernt waren, also eigentlich hätte zum Zeitpunkt ihres Anschlags schon die nächste Taste angeschlagen gewesen sein müssen. 3. ist in den Spalten *Mean* und *Median* zu sehen, dass die (rohen) Lageparameter alle deutlich und systematisch unterhalb des zu erwarteten IOIs von 125 ms liegen, die PatientInnen also alle zu schnell spielten. Am ehesten zu erklären wäre diese Diskrepanz durch eine fehlerhafte Metronomspur im MIDI-Sequencer.
+`r kfigr::figr("OverviewTabIOIs")` zeigt einige Interessante Eigenschaften des Datensatzes: Erstens sind in der Spalte *Min* die über Hälfte der Einträge einstellig, der Rest befindet sich im niedrigen zweistelligen Bereich, d.h. dass es extrem kurze Dauern zwischen aufeinanderfolgenden Tönen gab. Und zwar so kurz, dass einige dieser Töne psychophysisch eigentlich zeitlich gar nicht mehr zu trennen sein können. Zweitens zeigt die Spalte *Max*, dass es auch IOIs gab, die zeitlich mehr als das doppelte des nominellen IOI von der vorhergehenden Note entfernt waren, also eigentlich hätte zum Zeitpunkt ihres Anschlags schon die nächste Taste angeschlagen gewesen sein müssen. Drittens ist in den Spalten *Mean* und *Median* zu sehen, dass die (rohen) Lageparameter alle deutlich und systematisch unterhalb des zu erwarteten IOIs von 125 ms liegen, die PatientInnen tendenziell also alle zu schnell spielten. Am ehesten zu erklären wäre diese Diskrepanz durch eine fehlerhafte Metronomspur im MIDI-Sequencer.
 
-Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* ist erklärbar durch den Datenverlust bei PatientIn P05, lediglich am ersten Tag vor der Stimulation sind ca. 130 Tonleitern mehr gespielt worden als in den folgenden Bedingungen ohne Datenverluste.
+Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* (Tag 15) ist erklärbar durch den Datenverlust bei PatientIn P05. Lediglich am ersten Tag vor der Stimulation sind ca. 130 Tonleitern mehr gespielt worden verglichen mit den folgenden Bedingungen ohne Datenverluste.
 
 #### P04
 
 ```{r OverviewPlotIOIsP04, anchor=FIGREF}
 ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
   ggplot2::geom_density() +
-  ggplot2::geom_rug() +
+  # ggplot2::geom_rug() +
   ggplot2::facet_grid(rows = dplyr::vars(Day), cols = dplyr::vars(Time)) +
   ggplot2::xlab("IOI (ms)")
 ```
@@ -158,7 +158,7 @@ ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
 
 ***
 
-Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Verteilungen aufweisen. Allerdings wird auch deutlich, dass PatientInnen nach unterschiedlich vielen Tonleitern dieses Phänomen zeigen, und man deshalb zur genaueren Untersuchung die keweils letzten zehn oder 15 Tonleitern aller PatientInnen miteinander vergleichen müsste.
+Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Verteilungen aufweisen. Allerdings wird auch deutlich, dass PatientInnen nach unterschiedlich vielen Tonleitern dieses Phänomen zeigen, und man deshalb zur genaueren Untersuchung die jeweils letzten zehn oder 15 Tonleitern aller PatientInnen miteinander vergleichen müsste.
 
 ***
 
@@ -223,13 +223,13 @@ ggplot2::ggplot(dplyr::group_by(n_scales,
                                 Day, Time), 
                 ggplot2::aes(Time, N, color = ID, linetype = ID,
                              group = ID)) +
-  ggplot2::geom_point() +
-  ggplot2::geom_line() +
+  ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5)) +
+  ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
   ggplot2::facet_grid(cols = dplyr::vars(Day)) +
   ggplot2::ylab("Number of scales")
 ```
 
-`r kfigr::figr("NumberOfScalesProfilePlot", type = FIGREF)`. *Profilgraphen der Anzahl gespielter Tonleitern jedes/r PatientIn pro Bedingung.*
+`r kfigr::figr("NumberOfScalesProfilePlot", type = FIGREF)`. *Profilgraphen der Anzahl gespielter Tonleitern jedes/r PatientIn pro Bedingung. An Tag 15 fehlen Daten der/s PatientIn P05.*
 
 ***
 
@@ -268,6 +268,10 @@ ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
   ggplot2::xlab("log(sd(IOI))")
 ```
 
+`r kfigr::figr("OverviewPlotLogSDs")`. *Logarithmierung der Standardabweichungen führt zu "normaleren" Verteilungen als nicht-logarithmierte Daten (`r kfigr::figr("OverviewPlotSDs")`).*
+
+***
+
 Der Shapiro-Wilk-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
 
 ***
@@ -285,7 +289,7 @@ knitr::kable(dplyr::summarise(dplyr::group_by(SDs,
 
 Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen noch weit von einer Normalverteilung entfernt sind. Da einige der getesteten Teildatensätze nicht unabhängig voneinander sind (nämlich die wiederholten Messungen innerhalb eines/r PatientIn), wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von 0.05 / 3 = 0.017 wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
 
-Deshalb wird anstattdessen eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
+Deshalb wird anstelle der $\log$- eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
 
 ### Modellierung
 
