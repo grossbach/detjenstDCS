@@ -10,6 +10,8 @@ load("../data/priors_null.rda")
 m_null <- brms::brm(form_null,
                     data = SDs_reduced,
                     prior = priors_null,
+                    sample_prior = "yes",
+                    inits = 0,
                     # iter = 20000,
                     # warmup = 2000,
                     control = list(adapt_delta = 0.8))

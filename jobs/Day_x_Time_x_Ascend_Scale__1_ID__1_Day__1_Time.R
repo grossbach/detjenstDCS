@@ -10,9 +10,9 @@ load("../data/priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time.rda")
 m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time <- brms::brm(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
                                                               data = SDs_reduced,
                                                               prior = priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
-                                                              # iter = 10000,
-                                                              # warmup = 2000,
-                                                              control = list(adapt_delta = 0.8))
+                                                              sample_prior = "yes",
+                                                              inits = 0,
+                                                              control = list(adapt_delta = 0.9))
 
 # Loo-ing --------------------------------------------------------------------
 

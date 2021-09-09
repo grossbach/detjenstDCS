@@ -10,6 +10,8 @@ load("../data/priors_Day_Time__1_ID.rda")
 m_Day_Time__1_ID <- brms::brm(form_Day_Time__1_ID,
                               data = SDs_reduced,
                               prior = priors_Day_Time__1_ID,
+                              sample_prior = "yes",
+                              inits = 0,
                               # iter = 20000,
                               # warmup = 2000,
                               control = list(adapt_delta = 0.8))

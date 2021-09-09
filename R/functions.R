@@ -108,3 +108,15 @@ mgrep <- function(pattern, x) {
 mgrepl <- function(pattern, x) {
   return(as.logical(mgrep(pattern, x)))
 }
+model_em_all <- function() {
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/null.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time_Ascend__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_Time_Ascend_Scale__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_Ascend_Scale__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time.R")
+  rstudioapi::jobRunScript("~/files/customers/detjens_ingvild/detjenstDCS/jobs/Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend.R")
+}
