@@ -83,15 +83,15 @@ if (interactive()) {
   mdata$Time[is.na(mdata$Time)] <- "follow_up" # set "Time" of follow-up measurements (arbitrarily) to pre
   mdata <- dplyr::mutate(mdata,
                          ID = factor(ID),
-                         # Day = factor(stringr::str_extract(Day, 
-                         #                                   "\\d{1,2}"),
-                         #              ordered = TRUE,
-                         #              labels = c("1", "8", "15", "43"),
-                         #              levels = c("1", "8", "15", "43")),
-                         Day = as.numeric(stringr::str_extract(Day, 
-                                                               "\\d{1,2}")),
-                         Day.0 = as.numeric(stringr::str_extract(Day, 
-                                                                 "\\d{1,2}")) - 1,
+                         Day = factor(stringr::str_extract(Day,
+                                                           "\\d{1,2}"),
+                                      ordered = TRUE,
+                                      labels = c("1", "8", "15", "43"),
+                                      levels = c("1", "8", "15", "43")),
+                         # Day = as.numeric(stringr::str_extract(Day, 
+                         #                                       "\\d{1,2}")),
+                         # Day.0 = as.numeric(stringr::str_extract(Day, 
+                         #                                         "\\d{1,2}")) - 1,
                          Time = factor(Time, # Time deliberately not ordered, as for modelling, 'follow-up' needs
                                        labels = c("pre", "post", "follow_up"), # to be removed anyway
                                        levels = c("pre", "post", "follow_up")),
@@ -116,7 +116,7 @@ Die Auswertung wurde mit dem Paket brms [@Buerkner2017; @Buerkner2018], einem Fr
 ```{r OverviewPlotIOIs, anchor=FIGREF}
 ggplot2::ggplot(mdata[mdata$ID != "P04", ], ggplot2::aes(IOI, color = Scale)) +
   ggplot2::geom_density() +
-  ggplot2::facet_grid(rows = dplyr::vars(Day.0), 
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
   ggplot2::xlab("IOI (ms)")
 
@@ -134,7 +134,7 @@ Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlo
 
 ```{r OverviewTabIOIs, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ], 
-                                              Day.0, 
+                                              Day, 
                                               Time), 
                               Min = min(IOI),
                               Max = max(IOI),
@@ -156,7 +156,7 @@ Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* (siehe
 ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
   ggplot2::geom_density() +
   # ggplot2::geom_rug() +
-  ggplot2::facet_grid(rows = dplyr::vars(Day.0), 
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
   ggplot2::xlab("IOI (ms)")
 ```
@@ -173,7 +173,7 @@ Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Ve
 
 ```{r OverviewTabIOIsP04, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ], 
-                                              Day.0, 
+                                              Day, 
                                               Time), 
                               Min = min(IOI),
                               Max = max(IOI),
@@ -190,11 +190,11 @@ Auch bei PatientIn P04 liegen Mittelwert und Median der IOIs sehr nahe bei 120 m
 ```{r}
 if (interactive()) {
   SDs <- dplyr::summarize(dplyr::group_by(mdata,
-                                          ID, Day.0, Time, Ascend, Scale),
+                                          ID, Day, Time, Ascend, Scale),
                           SD = sd(IOI),
                           .groups = "drop_last")
   SDs <- dplyr::mutate(dplyr::group_by(SDs,
-                                       ID, Day.0, Time, Ascend),
+                                       ID, Day, Time, Ascend),
                        Scale.c = as.vector(scale(Scale,
                                                  scale = FALSE)))
   usethis::use_data(SDs,
@@ -210,15 +210,15 @@ Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festg
 
 ```{r NumberOfScalesBoxPlot, anchor=FIGREF}
 n_scales <- dplyr::summarize(dplyr::group_by(SDs,
-                                             ID, Day.0, Time),
+                                             ID, Day, Time),
                              N = max(Scale),
                              .groups = "drop_last")
 ggplot2::ggplot(dplyr::group_by(n_scales,
-                                Day.0, Time), 
+                                Day, Time), 
                 ggplot2::aes(Time, N)) +
   ggplot2::geom_boxplot(outlier.colour = "white") +
   ggplot2::geom_jitter(width = 0.05, color = "blue", alpha = 0.2) +
-  ggplot2::facet_grid(cols = dplyr::vars(Day.0)) +
+  ggplot2::facet_grid(cols = dplyr::vars(Day)) +
   ggplot2::ylab("Number of scales")
 ```
 
@@ -231,12 +231,12 @@ In `r kfigr::figr("NumberOfScalesBoxPlot")` entspricht jeder der hellblauen Punk
 
 ```{r NumberOfScalesProfilePlot, anchor=FIGREF, message=FALSE}
 ggplot2::ggplot(dplyr::group_by(n_scales,
-                                Day.0, Time), 
+                                Day, Time), 
                 ggplot2::aes(Time, N, color = ID, linetype = ID,
                              group = ID)) +
   ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5)) +
   ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
-  ggplot2::facet_grid(cols = dplyr::vars(Day.0)) +
+  ggplot2::facet_grid(cols = dplyr::vars(Day)) +
   ggplot2::ylab("Number of scales")
 ```
 
@@ -259,7 +259,7 @@ vom Mittelwert (also den mittleren IOIs) abhängig, aber der Unterschied zwische
 ```{r OverviewPlotSDs, anchor=FIGREF}
 ggplot2::ggplot(SDs, ggplot2::aes(SD)) +
   ggplot2::geom_density() +
-  ggplot2::facet_grid(rows = dplyr::vars(Day.0), 
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
   ggplot2::xlab("Standard deviation of IOIs (ms)")
 ```
@@ -274,7 +274,7 @@ Die rechtsschiefen Verteilungen der SDs in `r kfigr::figr("OverviewPlotSDs")` le
 ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
   ggplot2::geom_density() +
   ggplot2::geom_rug() +
-  ggplot2::facet_grid(rows = dplyr::vars(Day.0), 
+  ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
   ggplot2::xlab("log(sd(IOI))")
 ```
@@ -291,7 +291,7 @@ Der Shapiro-Wilk-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011
 
 ```{r ShapiroTab, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(SDs, 
-                                              ID, Day.0, Time),
+                                              ID, Day, Time),
                               `p-value` = shapiro.test(SDs$SD)$p.value,
                               N = dplyr::n(),
                               .groups = "drop_last"),
@@ -387,7 +387,7 @@ Die Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, d
 
 ```{r, message=FALSE}
 SDs_reduced <- dplyr::filter(SDs,
-                             Day.0 != 42)
+                             Day != 42)
 usethis::use_data(SDs_reduced,
                   overwrite = TRUE)
 ```
@@ -484,7 +484,7 @@ Das Modell soll einen Populationsparameter, nämlich *Tag*, schätzen.
 `r kfigr::figr("form_Day__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day__1_ID, anchor=EQREF, message=FALSE}
-(form_Day__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 +
+(form_Day__1_ID <- brms::bf(SD ~ 0 + Intercept + Day +
                               (1 | ID), 
                        family = brms::skew_normal()))
 usethis::use_data(form_Day__1_ID,
@@ -541,7 +541,7 @@ Als zweiter Populationseffekt wird dem Modell *Zeit* hinzugefügt.
 `r kfigr::figr("form_Day_Time__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_Time__1_ID, anchor=EQREF, message=FALSE}
-(form_Day_Time__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 + Time +
+(form_Day_Time__1_ID <- brms::bf(SD ~ 0 + Intercept + Day + Time +
                               (1 | ID), 
                        family = brms::skew_normal()))
 usethis::use_data(form_Day_Time__1_ID,
@@ -597,7 +597,7 @@ Der dritte Effekt ist *Aufwärts*.
 `r kfigr::figr("form_Day_Time_Ascend__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_Time_Ascend__1_ID, anchor=EQREF, message=FALSE}
-(form_Day_Time_Ascend__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 + Time + Ascend +
+(form_Day_Time_Ascend__1_ID <- brms::bf(SD ~ 0 + Intercept + Day + Time + Ascend +
                               (1 | ID), 
                        family = brms::skew_normal()))
 usethis::use_data(form_Day_Time_Ascend__1_ID,
@@ -653,7 +653,7 @@ Jetzt kommt noch die laufende Nummer der gespielten Tonleiter hinzu.
 `r kfigr::figr("form_Day_Time_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_Time_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
-(form_Day_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 + Time + Ascend + Scale.c +
+(form_Day_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day + Time + Ascend + Scale.c +
                                                 (1 | ID), 
                                               family = brms::skew_normal()))
 usethis::use_data(form_Day_Time_Ascend_Scale__1_ID,
@@ -710,7 +710,7 @@ In diesem Abschnitt wird die erste Interaktion modelliert, sodass die Steigungen
 `r kfigr::figr("form_Day_x_Time_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_x_Time_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
-(form_Day_x_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 * Time + Ascend + Scale.c +
+(form_Day_x_Time_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day * Time + Ascend + Scale.c +
                                                 (1 | ID), 
                                               family = brms::skew_normal()))
 usethis::use_data(form_Day_x_Time_Ascend_Scale__1_ID,
@@ -767,7 +767,7 @@ Dieses Modell berücksichtigt zusätzlich die Interaktion von *Aufwärts* mit *T
 `r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_x_Time_x_Ascend_Scale__1_ID, anchor=EQREF, message=FALSE}
-(form_Day_x_Time_x_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day.0 * Time * Ascend + Scale.c +
+(form_Day_x_Time_x_Ascend_Scale__1_ID <- brms::bf(SD ~ 0 + Intercept + Day * Time * Ascend + Scale.c +
                                                 (1 | ID), 
                                               family = brms::skew_normal()))
 usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID,
@@ -829,9 +829,9 @@ In diesem Modell wird zusätzlich ein variierendes Interzept für *Tag* modellie
 `r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, anchor=EQREF, message=FALSE}
-(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day <- brms::bf(SD ~ 0 + Intercept + Day.0 * Time * Ascend + Scale.c +
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day <- brms::bf(SD ~ 0 + Intercept + Day * Time * Ascend + Scale.c +
                                                     (1 | ID) +
-                                                    (1 | Day.0), 
+                                                    (1 | Day), 
                                                   family = brms::skew_normal()))
 usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
                   overwrite = TRUE)
@@ -847,7 +847,7 @@ usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
                                                                     group = "ID"),
                                                     brms::set_prior("normal(0, 0.5)",
                                                                     class = "sd", 
-                                                                    group = "Day.0"),
+                                                                    group = "Day"),
                                                     brms::set_prior("normal(0, 2)",
                                                                     class = "b"),
                                                     brms::set_prior("normal(20, 2)",
@@ -898,9 +898,9 @@ patchwork::wrap_plots(p,
 `r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time, anchor=EQREF, message=FALSE}
-(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time <- brms::bf(SD ~ 0 + Intercept + Day.0 * Time * Ascend + Scale.c +
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time <- brms::bf(SD ~ 0 + Intercept + Day * Time * Ascend + Scale.c +
                                                                    (1 | ID) +
-                                                                   (1 | Day.0) +
+                                                                   (1 | Day) +
                                                                    (1 | Time), 
                                                                  family = brms::skew_normal()))
 usethis::use_data(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
@@ -961,9 +961,9 @@ patchwork::wrap_plots(p,
 `r kfigr::figr("form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend", type = FIGREF)`. *Modell-Formel des Modells.*
 
 ```{r form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend, anchor=EQREF, message=FALSE}
-(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend <- brms::bf(SD ~ 0 + Intercept + Day.0 * Time * Ascend + Scale.c +
+(form_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend <- brms::bf(SD ~ 0 + Intercept + Day * Time * Ascend + Scale.c +
                                                                    (1 | ID) +
-                                                                   (1 | Day.0) +
+                                                                   (1 | Day) +
                                                                    (1 | Time) +
                                                                    (1 | Ascend), 
                                                                  family = brms::skew_normal()))
@@ -1025,16 +1025,18 @@ patchwork::wrap_plots(p,
 `r kfigr::figr("ModelCompareTab", type = TABREF)`. *Vergleich der Modelle nach prädiktiver Genauigkeit.*
 
 ```{r ModelCompareTab, anchor=TABREF}
-brms::loo_compare(m_null,
-                  m_Day__1_ID,
-                  m_Day_Time__1_ID,
-                  m_Day_Time_Ascend__1_ID,
-                  m_Day_Time_Ascend_Scale__1_ID,
-                  m_Day_x_Time_Ascend_Scale__1_ID,
-                  m_Day_x_Time_x_Ascend_Scale__1_ID,
-                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
-                  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend)
+brms::loo_compare(
+  m_null,
+  m_Day__1_ID,
+  m_Day_Time__1_ID,
+  m_Day_Time_Ascend__1_ID,
+  m_Day_Time_Ascend_Scale__1_ID,
+  m_Day_x_Time_Ascend_Scale__1_ID,
+  m_Day_x_Time_x_Ascend_Scale__1_ID,
+  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
+  m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend
+  )
 ```
 
 `r kfigr::figr("ModelCompareTab")` zeigt, dass das Model *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit)* am besten abschnitt, da sein elpd-Wert der kleinste aller miteinander verglichenen Modelle ist (siehe [Modellierung]). Diese Modell erklärt von allen untersuchten Modellen die vorliegenden Daten also am besten. Die Spalte *elpd_diff* der Tabelle zeigt, wie groß der "Abstand" eines Modells zum besten Modell ist, während die Spalte *se_diff* den Schätzfehler dieses Abstandes aufführt. Wenn die elpd-Differenz eines Modells mehr als zweimal den Wert seines Schätzfehlers entfernt von Null liegt, wird sein Unterschied zum besten Modell als bedeutsam erachtet. Dementsprechend sind nur die drei unteren in der Tabelle aufgeführten Modelle vom besten Modell zu unterscheiden.

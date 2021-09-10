@@ -8,19 +8,17 @@ load("../data/priors_Day_Time_Ascend__1_ID.rda")
 # Modelling --------------------------------------------------------------------
 
 m_Day_Time_Ascend__1_ID <- brms::brm(form_Day_Time_Ascend__1_ID,
-                              data = SDs_reduced,
-                              prior = priors_Day_Time_Ascend__1_ID,
-                              sample_prior = "yes",
-                              inits = 0,
-                              # iter = 20000,
-                              # warmup = 2000,
-                              control = list(adapt_delta = 0.8))
+                                     data = SDs_reduced,
+                                     prior = priors_Day_Time_Ascend__1_ID,
+                                     sample_prior = "yes",
+                                     inits = 0,
+                                     control = list(adapt_delta = 0.8))
 
 # Loo-ing --------------------------------------------------------------------
 
 m_Day_Time_Ascend__1_ID <- brms::add_criterion(m_Day_Time_Ascend__1_ID,
-                                        "loo",
-                                        reloo = TRUE)
+                                               "loo",
+                                               reloo = TRUE)
 
 # Saving --------------------------------------------------------------------
 
