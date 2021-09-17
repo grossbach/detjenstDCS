@@ -50,7 +50,7 @@ if (interactive()) {
 
 ## Methoden
 
-Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) dreimal mit tDC stimuliert. Vorher (prä) und nachher (post) wurde jedesmal die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation!) erhoben (d43). Bei PatientIn P05 fehlen die Daten von Tag 15.
+Fünf dystone PianistInnen (P01 -- P05) wurden im Abstand von 7 Tagen (d1, d8 und d15) dreimal mit tDC stimuliert. Vorher (prä) und nachher (post) wurde jedesmal die zeitliche Regelmäßigkeit des C-Dur-Tonleiterspiels (aufwärts und abwärts) am MIDI-Klavier registriert. Nach weiteren vier Wochen wurde eine follow-up-Messung (ohne Stimulation) erhoben (d43). Bei PatientIn P05 fehlen die Daten von Tag 15.
 
 Alle PatientInnen außer P04 spielten die Tonleitern in Sechzehnteln zu einem auf 120 bpm eingestellten Metronom. Bei dieser Spielgeschwindigkeit dauert das nominelle Inter-onset Interval (IOI) `r 1000 / (120 * 4 / 60)` ms, bei 100 bpm (PatientIn P04) entsprechend `r 1000 / (100 * 4 / 60)` ms.
 
@@ -114,19 +114,19 @@ Die Auswertung wurde mit dem Paket brms [@Buerkner2017; @Buerkner2018], einem Fr
 #### P01, P02, P03, P05
 
 ```{r OverviewPlotIOIs, anchor=FIGREF}
-ggplot2::ggplot(mdata[mdata$ID != "P04", ], ggplot2::aes(IOI, color = Scale)) +
+ggplot2::ggplot(mdata[mdata$ID != "P04", ], 
+                ggplot2::aes(IOI, color = factor(Scale))) +
   ggplot2::geom_density() +
   ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
-  ggplot2::xlab("IOI (ms)")
-
+  ggplot2::xlab("IOI (ms)") 
 ```
 
-`r kfigr::figr("OverviewPlotIOIs", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P01, P02, P03 und P05 gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(0, 7, 14 und 42).*
+`r kfigr::figr("OverviewPlotIOIs", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P01, P02, P03 und P05 gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(1, 8, 15 und 43).*
 
 ***
 
-Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlotIOIs")`) sind zunächst erwartungsgemäß spitzer als normal und rechtsschief. Am ersten Tag sind die Verteilungen der gegen Ende des Durchgangs gespielten Tonleitern (hellgrüne bis gelbe Linien) flacher und breiter als früher gespielte Tonleitern (blaue bis dunkelgrüne Linien). Das ist ein Hinweis auf eine Korrelation von laufender Tonleiterzahl und Streubreite der IOIs und könnte von zunehmender Ermüdung der PatientInnen herrühren. Ein Blick auf `r kfigr::figr("OverviewTabIOIs", type = TABREF)` zeigt aber, dass in dieser ersten Bedingung besonders viele Tonleitern gespielt wurden, weshalb in den anderen Bedingungen (abgesehen von d43, follow-up) keine gelben Kurven sichtbar sind. In der Follow-up-Bedingung ist diese Verbreiterung der Verteilungskurven bei späteren Tonleitern allerdings nicht sichtbar.
+Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlotIOIs")`) sind zunächst erwartungsgemäß spitzer als normal und rechtsschief. Am ersten Tag sind die Verteilungen der gegen Ende des Durchgangs gespielten Tonleitern (lila- bis pinkfarbene Linien) flacher und breiter als früher gespielte Tonleitern (orangefarbene bis blaue Linien). Das ist ein Hinweis auf eine Korrelation von laufender Tonleiterzahl und Streubreite der IOIs und könnte von zunehmender Ermüdung der PatientInnen herrühren. Ein Blick auf `r kfigr::figr("OverviewTabIOIs", type = TABREF)` zeigt aber, dass in dieser ersten Bedingung besonders viele Tonleitern gespielt wurden, weshalb in den anderen Bedingungen (abgesehen von d43, follow-up) keine pinkfarbenen Kurven sichtbar sind. In der Follow-up-Bedingung ist diese Verbreiterung der Verteilungskurven bei späteren Tonleitern allerdings nicht sichtbar.
 
 ***
 
@@ -153,7 +153,8 @@ Die unterschiedlichen Anzahlen ausgewerteter Tonleitern in der Spalte *N* (siehe
 #### P04
 
 ```{r OverviewPlotIOIsP04, anchor=FIGREF}
-ggplot2::ggplot(mdata[mdata$ID == "P04", ], ggplot2::aes(IOI, color = Scale)) +
+ggplot2::ggplot(mdata[mdata$ID == "P04", ], 
+                ggplot2::aes(IOI, color = factor(Scale))) +
   ggplot2::geom_density() +
   # ggplot2::geom_rug() +
   ggplot2::facet_grid(rows = dplyr::vars(Day), 
@@ -387,7 +388,7 @@ Die Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, d
 
 ```{r, message=FALSE}
 SDs_reduced <- dplyr::filter(SDs,
-                             Day != 42)
+                             Day != 43)
 usethis::use_data(SDs_reduced,
                   overwrite = TRUE)
 ```
