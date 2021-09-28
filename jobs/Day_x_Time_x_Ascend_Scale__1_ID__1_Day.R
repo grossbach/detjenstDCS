@@ -12,6 +12,8 @@ m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day <- brms::brm(form_Day_x_Time_x_Ascend_S
                                                       prior = priors_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
                                                       sample_prior = "yes",
                                                       inits = 0,
+                                                      iter = 3000,
+                                                      warmup = 1000,
                                                       control = list(adapt_delta = 0.9))
 
 # Loo-ing --------------------------------------------------------------------
