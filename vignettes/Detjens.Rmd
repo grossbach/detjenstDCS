@@ -119,7 +119,8 @@ ggplot2::ggplot(mdata[mdata$ID != "P04", ],
   ggplot2::geom_density() +
   ggplot2::facet_grid(rows = dplyr::vars(Day), 
                       cols = dplyr::vars(Time)) +
-  ggplot2::xlab("IOI (ms)") 
+  ggplot2::xlab("IOI (ms)") +
+  ggplot2::scale_color_discrete(name = "Scale number")
 ```
 
 `r kfigr::figr("OverviewPlotIOIs", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P01, P02, P03 und P05 gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(1, 8, 15 und 43).*
@@ -136,10 +137,10 @@ Die Verteilungen der IOIs in den sieben Bedingungen (`r kfigr::figr("OverviewPlo
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID != "P04", ], 
                                               Day, 
                                               Time), 
+                              Median = median(IOI),
                               Min = min(IOI),
                               Max = max(IOI),
                               IQR = IQR(IOI),
-                              Median = median(IOI),
                               Mean = mean(IOI),
                               SD = sd(IOI),
                               N = dplyr::n(),
@@ -166,20 +167,20 @@ ggplot2::ggplot(mdata[mdata$ID == "P04", ],
 
 ***
 
-Auch bei P04 gab es das Phänomen, dass später gespielte Tonleitern flachere Verteilungen aufweisen. Allerdings wird auch deutlich, dass PatientInnen nach unterschiedlich vielen Tonleitern dieses Phänomen zeigen, und man deshalb zur genaueren Untersuchung die jeweils letzten zehn oder 15 Tonleitern aller PatientInnen miteinander vergleichen müsste.
+Auch bei P04 (`r kfigr::figr("OverviewTabIOIsP04", type = TABREF)`) gab es das Phänomen, dass später gespielte Tonleitern flachere Verteilungen aufweisen. Allerdings wird auch deutlich, dass PatientInnen nach unterschiedlich vielen Tonleitern dieses Phänomen zeigen, und man deshalb zur genaueren Untersuchung die jeweils letzten zehn oder 15 Tonleitern aller PatientInnen miteinander vergleichen müsste.
 
 ***
 
-`r kfigr::figr("OverviewTabIOIsP04", type = TABREF)`. *Lage- und Streuparameter der Inter-onset Intervalle von P04 nach Tag und Zeitpunkt (in ms).*
+`r kfigr::figr("OverviewTabIOIsP04")`. *Lage- und Streuparameter der Inter-onset Intervalle von P04 nach Tag und Zeitpunkt (in ms).*
 
 ```{r OverviewTabIOIsP04, anchor=TABREF}
 knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ], 
                                               Day, 
                                               Time), 
+                              Median = median(IOI),
                               Min = min(IOI),
                               Max = max(IOI),
                               IQR = IQR(IOI),
-                              Median = median(IOI),
                               Mean = mean(IOI),
                               SD = sd(IOI),
                               N = dplyr::n(),
@@ -227,7 +228,7 @@ ggplot2::ggplot(dplyr::group_by(n_scales,
 
 ***
 
-In `r kfigr::figr("NumberOfScalesBoxPlot")` entspricht jeder der hellblauen Punkte einer/m PatientIn. An Tag d15 sind wegen des Datenverlustes bei P05 nur vier statt fünf Punkte gezeigt.
+In `r kfigr::figr("NumberOfScalesBoxPlot")` entspricht jeder der hellblauen Punkte einer/m PatientIn. An Tag 15 sind wegen des Datenverlustes bei P05 nur vier statt fünf Punkte gezeigt.
 
 
 ```{r NumberOfScalesProfilePlot, anchor=FIGREF, message=FALSE}
@@ -301,7 +302,7 @@ knitr::kable(dplyr::summarise(dplyr::group_by(SDs,
 
 Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen sich deutlich von einer Normalverteilung unterscheiden. Da die getesteten Teildatensätze nicht unabhängig voneinander sind, wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von 0.05 / ((3 x 2 x 5)  + 5) = 0.00143 wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
 
-Deshalb wird anstelle der $\log$- eine schiefe Normalverteilung (*skew_normal*) als Link-Funktion verwendet.
+Deshalb wird anstelle der $\log$- eine schiefe Normalverteilung als Link-Funktion verwendet (https://en.wikipedia.org/wiki/Skew_normal_distribution).
 
 ### Modellierung
 
@@ -311,7 +312,7 @@ Im nächsten Schritt wird häufig ein Populationseffekt (oft auch Fester Effekt 
 
 Das "komplette" Modell ist ein theoretisch sinnvolles Modell und beschreibt möglichst vollständig den Daten-generierenden Prozess, wie wir ihn uns vorstellen. Die Vorstellung über diesen Prozess speist sich aus der Theorie, also der vorliegenden Literatur und eigenen, daraus aufbauenden Ideen. Dementsprechend muss vor der Datenerhebung genau feststehen, wie die Daten analysiert werden sollen, damit auch alle zur Modellierung notwendigen Kovariaten erhoben werden können.
 
-Am Ende der Modellierung steht immer der Vergleich der verschiedenen Modelle. Um objektiv entscheiden zu können, welches dasjenige ist, das die Daten am besten erklärt, benötigt man einen Bewertungsalgorithmus. Da komplexere Modelle die Daten immer besser erklären als einfachere Modelle, wird beim Modell-Vergleich oft eine Strafe erteilt, die umso höher ausfällt, je komplexer ein Modell ist. Das hat zur Folge, dass es einen Kompromiss gibt aus Erklärungsgüte und Modellkomplexität. Würde man diesen Kompromiss nicht eingehen, würde immer das komplexeste Modell "gewinnen". Da theoretisch immer noch komplexere Modelle denkbar sind, würde man unglaublich komplexe Modelle bauen, die aber den Gedanken des Modells ad absurdum führen, nämlich dass ein Modell eine handhabbare, vereinfachende Erklärung eines komplexen Zusammenhangs darstellt. Als "Gegenmittel" könnte man eine willkürliche Stoppregel einführen (z.B. "Kein Modell darf mehr als fünf erklärende Variablen haben"). Beide Vorgehensweisen würden aber beim Erkenntnisgewinn nicht helfen, da ersteres nicht beim Erklären und Verstehen hilft (zu komplex) und letzteres möglicherweise immer noch zu komplex ist, oder eben nicht komplex genug, um die Daten hinreichend zu erklären. Anstelle der beschriebenen  Kompromissregel wird immer häufiger untersucht, welches der Modelle die vorliegenden Daten am besten rekonstruieren kann. Das Maß, anhand dessen die Übereinstimmung zwischen empirischen und rekonstruierten Daten quantifiziert wird, ist die *estimated logarithmic posterior density* [elpd, @Vehtari2017]. Je kleiner sie ist, desto besser gleichen sich empirischer und generierter Datensatz. 
+Am Ende der Modellierung steht immer der Vergleich der verschiedenen Modelle. Um objektiv entscheiden zu können, welches dasjenige ist, das die Daten am besten erklärt, benötigt man einen Bewertungsalgorithmus. Da komplexere Modelle die Daten immer besser erklären als einfachere Modelle, wird beim Modell-Vergleich oft eine Strafe erteilt, die umso höher ausfällt, je komplexer ein Modell ist. Das hat zur Folge, dass es einen Kompromiss gibt aus Erklärungsgüte und Modellkomplexität. Würde man diesen Kompromiss nicht eingehen, würde immer das komplexeste Modell "gewinnen". Da theoretisch immer noch komplexere Modelle denkbar sind, würde man unglaublich komplexe Modelle bauen, die aber den Gedanken des Modells ad absurdum führen, nämlich dass ein Modell eine handhabbare, vereinfachende Erklärung eines komplexen Zusammenhangs darstellt. Als "Gegenmittel" könnte man eine willkürliche Stoppregel einführen (z.B.: "Kein Modell darf mehr als fünf erklärende Variablen haben"). Beide Vorgehensweisen würden aber beim Erkenntnisgewinn nicht helfen, da ersteres nicht beim Erklären und Verstehen hilft (zu komplex) und letzteres möglicherweise immer noch zu komplex ist, oder eben nicht komplex genug, um die Daten hinreichend zu erklären. Anstelle der beschriebenen  Kompromissregel wird immer häufiger untersucht, welches der Modelle die vorliegenden Daten am besten rekonstruieren kann. Das Maß, anhand dessen die Übereinstimmung zwischen empirischen und rekonstruierten Daten quantifiziert wird, ist die *estimated logarithmic posterior density* [elpd, @Vehtari2017]. Je kleiner sie ist, desto besser gleichen sich empirischer und generierter Datensatz. 
 
 Die theoretisch motivierten Quellen von Varianz, die durch ein komplettes Modell aufgeklärt werden sollten, sind für den vorliegenden Fall in `r kfigr::figr("CompleteModelTab", type = TABREF)` aufgeführt.
 
@@ -478,7 +479,7 @@ Die posterioren Verteilungen der Parameter-Schätzer in der linken Spalte von `r
 
 #### Tag + (1 | ID)
 
-Das Modell soll einen Populationsparameter, nämlich *Tag*, schätzen.
+Dieses Modell soll zusätzlich einen Populationsparameter, nämlich *Tag*, schätzen. Da nicht erwartet werden kann, dass die PatientInnen jeden Tag gleichviel besser werden, der Effekt der tDC-Stimulation über die Zeit also nicht notwendigerweise linear verläuft, wurde hier eine Polynomialregression mit den Stimulationstagen als geordnetem Faktor gerechnet (1 < 8 < 15; siehe z.B. https://en.wikipedia.org/wiki/Polynomial_regression). Das hat zwar den Nachteil, dass das Modell nichts mehr über die zeitlichen Abstände zwischen den Stimulationen "weiß", dafür aber nichtlineare Effekte zeigen kann, was in diesem Kontext die bessere Option scheint.
 
 ***
 
@@ -492,7 +493,7 @@ usethis::use_data(form_Day__1_ID,
                   overwrite = TRUE)
 ```
 
-Da nun eine Steigung für die Variable *Tag* geschätzt werden soll, muss dieser eine Prior erhalten.
+Da nun $\beta_{linear}$ und ein $\beta_{quadratisch}$ für die Variable *Tag* geschätzt werden sollen, müssen diese eine Prior erhalten.
 
 ***
 
@@ -531,7 +532,7 @@ brms::conditional_effects(m_Day__1_ID)
 
 ***
 
-Es gibt anscheinend in der Vorher-Messung bei der mittleren Abwärtstonleiter einen schwachen Tageseffekt.
+**Das Modell Es gibt anscheinend in der Vorher-Messung bei der mittleren Abwärtstonleiter einen schwachen Tageseffekt.**
 
 #### Tag + Zeitpunkt + (1 | ID)
 
@@ -749,6 +750,11 @@ summary(m_Day_x_Time_Ascend_Scale__1_ID,
 ```{r Day_x_Time_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_Ascend_Scale__1_ID),
           plot = FALSE)
+for (n in 1:length(p)) {
+  p[[n]] <- p[[n]] +
+    ggthemes::scale_color_colorblind() +
+    ggthemes::scale_fill_colorblind()   
+}
 patchwork::wrap_plots(p) + 
   patchwork::plot_annotation(tag_levels = "A")
 ```
@@ -806,6 +812,11 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID),
           plot = FALSE)
+for (n in 1:length(p)) {
+  p[[n]] <- p[[n]] +
+    ggthemes::scale_color_colorblind() +
+    ggthemes::scale_fill_colorblind()   
+}
 patchwork::wrap_plots(p, 
                       design = "
                       ABC
@@ -879,6 +890,11 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day),
           plot = FALSE)
+for (n in 1:length(p)) {
+  p[[n]] <- p[[n]] +
+    ggthemes::scale_color_colorblind() +
+    ggthemes::scale_fill_colorblind()   
+}
 patchwork::wrap_plots(p, 
                       design = "
                       ABC
@@ -942,6 +958,11 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time),
           plot = FALSE)
+for (n in 1:length(p)) {
+  p[[n]] <- p[[n]] +
+    ggthemes::scale_color_colorblind() +
+    ggthemes::scale_fill_colorblind()   
+}
 patchwork::wrap_plots(p, 
                       design = "
                       ABC
@@ -1006,6 +1027,11 @@ summary(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend,
 ```{r Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot, anchor = FIGREF}
 p <- plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend),
           plot = FALSE)
+for (n in 1:length(p)) {
+  p[[n]] <- p[[n]] +
+    ggthemes::scale_color_colorblind() +
+    ggthemes::scale_fill_colorblind()   
+}
 patchwork::wrap_plots(p, 
                       design = "
                       ABC
@@ -1040,34 +1066,75 @@ brms::loo_compare(
   )
 ```
 
-`r kfigr::figr("ModelCompareTab")` zeigt, dass das Model *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit)* am besten abschnitt, da sein elpd-Wert der kleinste aller miteinander verglichenen Modelle ist (siehe [Modellierung]). Diese Modell erklärt von allen untersuchten Modellen die vorliegenden Daten also am besten. Die Spalte *elpd_diff* der Tabelle zeigt, wie groß der "Abstand" eines Modells zum besten Modell ist, während die Spalte *se_diff* den Schätzfehler dieses Abstandes aufführt. Wenn die elpd-Differenz eines Modells mehr als zweimal den Wert seines Schätzfehlers entfernt von Null liegt, wird sein Unterschied zum besten Modell als bedeutsam erachtet. Dementsprechend sind nur die drei unteren in der Tabelle aufgeführten Modelle vom besten Modell zu unterscheiden.
+`r kfigr::figr("ModelCompareTab")` zeigt, dass das Model *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag)* am besten abschnitt, da sein elpd-Wert der kleinste aller miteinander verglichenen Modelle ist (siehe [Modellierung]). Diese Modell erklärt von allen untersuchten Modellen die vorliegenden Daten also am besten. Die Spalte *elpd_diff* der Tabelle zeigt, wie groß der "Abstand" eines Modells zum besten Modell ist, während die Spalte *se_diff* den Schätzfehler dieses Abstandes aufführt. Wenn die elpd-Differenz eines Modells mehr als zweimal den Wert seines Schätzfehlers entfernt von Null liegt, wird sein Unterschied zum besten Modell als bedeutsam erachtet. Dementsprechend sind nur die drei unteren in der Tabelle aufgeführten Modelle vom besten Modell zu unterscheiden.
 
-### Unmittelbare Behandlungseffekte
+#### Polynomiale Regression
 
-Wie in `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time_CondPlot")`E zu sehen, konnte kein Vorher-Nachher-Effekt bei der Spielunregelmäßigkeit innerhalb der Stimulationstage gezeigt werden (also gemittelt über aufwärts und abwärts gespielte Tonleitern).
+Polynomiale Regression ist aus statistischer Sicht nicht das ideale Werkzeug, um den Effekt geordneter Faktoren (hier: die Stimulationstage; 1 < 8 < 15) zu untersuchen [z.B. @Harrell2015; ch. 2.4.2]. Anstatt dessen wären Splines vermutlich die bessere Lösung gewesen.
 
-```{r}
-# brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-#                  c(`Tag 1` = "Intercept + Scale.c = Intercept + Timepost + Scale.c",
-#                    `Tag 8` = "Intercept + Day.L + Day.Q + Scale.c = Intercept + Day.L + Day.Q + Timepost + Scale.c",
-#                    `Tag 15` = ""))
-```
-
-
-### Unterschiede zwischen Spielrichtungen
-
-`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`F legt nahe, dass die in @Jabusch2004 erwähnten Unterschiede in der Spielregelmäßigkeit zwischen Aufwärts- und Abwärtstonleitern auch im vorliegenden Datensatz existieren.
+Im Rahmens der polynomialen Regression wird die Rechtfertigung für die Aufnahme eines quadratischen Effektes herausgefordert durch den Test, ob sich die geschätzten Regressionsparameter beider Effekte unterscheiden.
 
 ```{r}
-# brms::hypothesis(m_Day_Time_Ascend_Scale__1_ID,
-#                  # "Ascend1 = Intercept + Day.L + Day.Q + Timepost + Scale.c")
-#                  "Intercept = 0")
+(hyp_polyreg <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                  "Day.L = Day.Q"))
 ```
 
+Im Bayes'schen Kontext werden die Prior solch einer Hypothese mit der posterioren Wahrscheinlichkeit verglichen. Wenn beide Verteilungen zu stark überlappen, wird die Hypothese als wahrscheinlich nicht zutreffend verworfen.
 
-### Unterschiede 
+```{r}
+plot(hyp_polyreg)
+```
 
-### Langzeit-Effekt von tDCs
+#### Unmittelbare Behandlungseffekte
+
+Wie in `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot")`E zu sehen, konnte kein Vorher-Nachher-Effekt bei der Spielunregelmäßigkeit innerhalb der Stimulationstage gezeigt werden (also gemittelt über beide Gruppen sowie aufwärts und abwärts gespielte Tonleitern).
+
+```{r}
+(hyp_time <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                              c(pre_post = "Intercept = Intercept + Timepost")))
+```
+
+```{r}
+plot(hyp_time)
+```
+
+#### Unterschiede zwischen Stimulationstagen
+
+```{r}
+(hyp_day <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                               c(day = "Intercept = Intercept + Day.L + Day.Q")))
+```
+
+```{r}
+plot(hyp_day)
+```
+
+#### Unterschiede zwischen Spielrichtungen
+
+`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`F legt nahe, dass die in @Jabusch2004 erwähnten Unterschiede in der Spielregelmäßigkeit zwischen Aufwärts- und Abwärtstonleitern auch im vorliegenden Datensatz existieren. Die modellierte Dreifach-Interaktion Tag:Zeit:Aufwärts ist in `r kfigr::figr("ThreewayIntWinnerModel", type = FIGREF)` gezeigt.
+
+```{r ThreewayIntWinnerModel, anchor=FIGREF}
+plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, 
+                               effects = "Day:Time", 
+                               conditions = data.frame(Ascend = factor(c(0, 1)))))[[1]] +
+  ggthemes::scale_color_colorblind() +
+  ggthemes::scale_fill_colorblind()
+```
+
+`r kfigr::figr("ThreewayIntWinnerModel")`. *Die Dreifach-Interaktion Tag:Zeit:Aufwärts. Links sind die geschätzten Standardabweichungen bei Abwärtstonleitern, rechts bei Aufwärtstonleitern gezeigt (Punkte: .*
+
+***
+
+```{r}
+(hyp_ascend <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
+                                c(ascend = "Intercept = Intercept + Ascend1")))
+```
+
+```{r}
+plot(hyp_ascend)
+```
+
+#### Langzeit-Effekt von tDCs
 
 Um längerfristige Wirkung von tDCs auf die Regelmäßigkeit des Tonleiterspielens untersuchen zu können, wird im Folgenden ein **[...]**
 
@@ -1077,13 +1144,11 @@ Um längerfristige Wirkung von tDCs auf die Regelmäßigkeit des Tonleiterspiele
 
 # Diskussion
 
-Die winzige Stichprobengröße wäre eine mögliche Erklärung, warum das theoretische passendere Modell (*Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit)*) die Daten nicht am besten erklärt, da kleine Stichproben häufiger eine sehr große Varianz aufweisen und deshalb kein statistisch relevanter Unterschied zwischen Experimentalbedingungen feststellbar ist. Eine weitere Erklärung ist, dass zwischen den den Populationseffekten wirklich keine Interaktion existiert. Es ist jedoch nicht möglich festzustellen, welche der beiden Möglichkeiten die richtige Erklärung ist.
+Die winzige Stichprobengröße wäre eine mögliche Erklärung, warum das theoretisch passendere Modell (*Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit)*) die Daten nicht am besten erklärt, da kleine Stichproben häufiger eine sehr große Varianz aufweisen und deshalb kein statistisch relevanter Unterschied zwischen Experimentalbedingungen feststellbar ist. Eine weitere Erklärung ist, dass zwischen den den Populationseffekten wirklich keine Interaktion existiert.
 
-Die Modellierungsergebnisse im Abschnitt "[Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag) + (1 | Zeitpunkt) + (1 | Aufwärts)]" zeigen, dass es in den vorliegenden Daten keinen Hinweis auf eine unmittelbare Wirkung der tDC-Stimulation gibt, da es an keinem der drei Stimulationstage Vorher-Nachher-Effekte zu geben scheint. Es gibt aber eine leichte Verbesserung der Spielunregelmäßigkeit zwischen dem ersten und dem zweiten Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`E). 
+Die Modellierungsergebnisse im Abschnitt [Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)] und deren nähere Untersuchung im Abschnitt [Modell-Vergleich] zeigen, dass es in den vorliegenden Daten keinen Hinweis auf eine unmittelbare Wirkung der tDC-Stimulation gibt, da es an keinem der drei Stimulationstage Vorher-Nachher-Effekte zu geben scheint. Auch gibt keine eine Verbesserung der Spielunregelmäßigkeit zwischen dem ersten und dem zweiten Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`E). 
 
-Diese leichten Verbesserungen scheint es über die drei Wochen nur bei den Aufwärtstonleitern zu geben; bei den Abwärtstonleitern gibt es lediglich eine leichte Verbesserung zwischen erstem und zweitem Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`F).
-
-Die Aufschlüsselung nach *Zeitpunkt* und *Aufwärts* zeigt schließlich (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`G), dass es eine divergente Entwicklung bei der Spielverbesserung gab, insofern als .
+Die Standardabweichungen der Aufwärts- und Abwärtstonleitern entwickeln sich jedoch im Laufe der dreiwöchigen Stimulation deutlich auseinander, was sich in (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot")`G) so darstellt, als ob es bei den Abwärtstonleitern kaum Veränderungen gibt, sich die Regelmäßigkeit der Aufwärtstonleitern sich aber deutlich verbessert.
 
 #### Einschränkungen
 
