@@ -163,7 +163,7 @@ ggplot2::ggplot(mdata[mdata$ID == "P04", ],
   ggplot2::xlab("IOI (ms)")
 ```
 
-`r kfigr::figr("OverviewPlotIOIsP04", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P04 gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(0, 7, 14 und 42).*
+`r kfigr::figr("OverviewPlotIOIsP04", type = FIGREF)`. *Dichtefunktionsschätzung der Inter-onset Intervalle aller von P04 gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(1, 8, 15 und 43).*
 
 ***
 
@@ -187,7 +187,7 @@ knitr::kable(dplyr::summarise(dplyr::group_by(mdata[mdata$ID == "P04", ],
                               .groups = "drop_last"))
 ```
 
-Auch bei PatientIn P04 liegen Mittelwert und Median der IOIs sehr nahe bei 120 ms, was noch weniger zu ihrem nominellen IOI von 150 ms passt.
+Auch bei PatientIn P04 liegen Mittelwert und Median der IOIs sehr nahe bei 120 ms, was noch weniger zu ihrem/seinem nominellen IOI von 150 ms passt.
 
 ```{r}
 if (interactive()) {
@@ -208,7 +208,7 @@ if (interactive()) {
 
 #### Anzahl gespielter Tonleitern
 
-Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festgelegt, da die Ausprägung der Dystonie mitbestimmt, wieviele fehlerfreie Tonleitern eines vorgegebenen Tempos jemand spielen kann. Zielgröße war 30 fehlerfreie Skalen, was auch alle TeilnehmerInnen außer P04 bei 120 bpm erreichten. Während der Messung trug die Experimentatorin mit einem gewissen "Sicherheitsabstand" bei jeder Bedingung dafür Sorge, dass, wenn irgend möglich, mindestens 30 Tonleitern gespielt wurden.
+Die Anzahl der Tonleitern, die jede/r PatientIn spielte, war nicht absolut festgelegt, da die Ausprägung der Dystonie mitbestimmt, wieviele fehlerfreie Tonleitern eines vorgegebenen Tempos jemand spielen kann. Zielgröße war 30 fehlerfreie Skalen, was auch alle TeilnehmerInnen außer P04 bei 120 bpm erreichten. Während der Messung trug die Experimentatorin mit einem gewissen "Sicherheitsabstand" bei jeder Bedingung dafür Sorge, dass, wenn irgend möglich, mindestens 30 Tonleitern gespielt wurden; manche PatientInnen spielten aber in manchen Bedingungen sehr viel mehr Tonleitern.
 
 ```{r NumberOfScalesBoxPlot, anchor=FIGREF}
 n_scales <- dplyr::summarize(dplyr::group_by(SDs,
@@ -242,7 +242,7 @@ ggplot2::ggplot(dplyr::group_by(n_scales,
   ggplot2::ylab("Number of scales")
 ```
 
-`r kfigr::figr("NumberOfScalesProfilePlot", type = FIGREF)`. *Profilgraphen der Anzahl gespielter Tonleitern jedes/r PatientIn pro Bedingung. An Tag 14 fehlen Daten der/s PatientIn P05.*
+`r kfigr::figr("NumberOfScalesProfilePlot", type = FIGREF)`. *Profilgraphen der Anzahl gespielter Tonleitern jedes/r PatientIn pro Bedingung. An Tag 15 fehlen Daten der/s PatientIn P05.*
 
 ***
 
@@ -266,7 +266,7 @@ ggplot2::ggplot(SDs, ggplot2::aes(SD)) +
   ggplot2::xlab("Standard deviation of IOIs (ms)")
 ```
 
-`r kfigr::figr("OverviewPlotSDs", type = FIGREF)`. *Dichtefunktionsschätzung der Standardabweichungen der Inter-onset Intervalle aller gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(0, 7, 14 und 42).*
+`r kfigr::figr("OverviewPlotSDs", type = FIGREF)`. *Dichtefunktionsschätzung der Standardabweichungen der Inter-onset Intervalle aller gespielten Tonleitern, getrennt nach* Zeit *(pre, post, follow-up) und* Tag *(1, 8, 15 und 43).*
 
 ***
 
@@ -285,7 +285,7 @@ ggplot2::ggplot(SDs, ggplot2::aes(log(SD))) +
 
 ***
 
-Der Shapiro-Wilk-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`, @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
+Der Shapiro-Wilk-Test [`r kfigr::figr("ShapiroTab", type = TABREF)`; @Razali2011] testet die Nullhypothese, dass eine Variable normalverteilt ist. Ist der resultierende *p*-Wert größer als $\alpha$ (hier: 0,05), kann die $H_0$ nicht zurückgewiesen werden. Ist der *p*-Wert aber kleiner, muss man mit der gewählten Irrtumswahrscheinlichkeit davon ausgehen, dass die Variable nicht normalverteilt ist. 
 
 ***
 
@@ -300,7 +300,7 @@ knitr::kable(dplyr::summarise(dplyr::group_by(SDs,
              digits = 50)
 ```
 
-Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen sich deutlich von einer Normalverteilung unterscheiden. Da die getesteten Teildatensätze nicht unabhängig voneinander sind, wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von 0.05 / ((3 x 2 x 5)  + 5) = 0.00143 wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
+Die sehr kleinen *p*-Werte sind ein starker Hinweis darauf, das auch die logarithmierten Standardabweichungen sich deutlich von einer Normalverteilung unterscheiden. Da die getesteten Teildatensätze nicht unabhängig voneinander sind, wird zum Erreichen des nominellen $\alpha$-Niveaus von 5% die Bonferroni-Korrektur angewandt. Aber selbst die korrigierte $\alpha$-Schwelle von 0.05 / ((3 $\times$ 2 $\times$ 5)  + 5) = 0.00143 wird von den *p*-Werten der Shapiro-Wilk-Tests deutlich unterboten.
 
 Deshalb wird anstelle der $\log$- eine schiefe Normalverteilung als Link-Funktion verwendet (https://en.wikipedia.org/wiki/Skew_normal_distribution).
 
@@ -322,7 +322,7 @@ Die theoretisch motivierten Quellen von Varianz, die durch ein komplettes Modell
 # chunk intentionally left blank
 ```
 
-`r kfigr::figr("CompleteModelTab")`. *Die bekannten Varianzquellen im vorliegenden Versuchsdesign.*
+`r kfigr::figr("CompleteModelTab")`. *Die bekannten Varianzquellen im vorliegenden Versuchsdesign. Die Spalte* Bedeutung *führt die Bedeutung eines* Effektes *im kompletten Model auf; in Teilmodellen, wie sie im Text besprochen werden, ändert sich die Bedeutung teilweise.*
 
 ---------------------------------------------------------------------------------------------------------------------
 Effektklasse              Effekt                    Bedeutung                       Bemerkungen
@@ -335,8 +335,8 @@ Populationseffekte        Interzept                 Schätzt mittlere *SD* am   
                                                     individuellen Tonleitern
 
                           Tag                       Schätzt Unterschied zu          Wenn es einen tDCS-
-                                                    'Interzept' am <u>siebten</u>   Effekt gibt, der eine
-                                                    und <u>14.</u> Tag              Woche überdauert, dann 
+                                                    'Interzept' am <u>achten</u>    Effekt gibt, der eine
+                                                    und <u>15.</u> Tag              Woche überdauert, dann 
                                                                                     sollte der Schätzer $\neq$
                                                                                     0 sein
 
@@ -383,7 +383,7 @@ Gruppeneffekte            Individuum                Je ein Interzept für jedes
 
 Die Populationseffekte sind hier nicht nur einfache Eingabevariablen, sondern auch als Interaktionen im kompletten Modell enthalten, so dass (theoretisch) an verschiedenen Tagen unterschiedliche Steigungen z.B. für vor und nach der Intervention möglich sind. Damit Interaktionen stabil geschätzt werden können, sind sehr viel größere Stichproben erforderlich, als für einfache Effektschätzer. Die vorliegenden Daten von fünf PatientInnen werden deshalb keine sinnvollen Interaktionseffekte schätzbar machen. Umso wichtiger sind deshalb die Gruppen-Interzepte für *Individuum*, *Tag*, *Zeitpunkt*, *Aufwärts* und *Skalennummer*.
 
-Das komplette Modell soll mit den Variablen *Tag*, *Zeitpunkt*, *Aufwärts* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen 1 bis 15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Zeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels (Tab. 1 in @Jabusch2004)); sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Aufwärts* ein Wert < 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters *Skalennummer* Rechnung getragen wird.
+Das komplette Modell soll mit den Variablen *Tag*, *Zeitpunkt*, *Aufwärts* und fortlaufender *Tonleiternummer* die Varianz in den Standardabweichungen der Inter-onset Intervalle erklären. An den Tagen 1 bis 15 wurde jeweils stimuliert. Wenn die Stimulation eine Verringerung der Standardabweichung der *IOI*s zur Folge hat, die mindestens eine Woche anhält, ist ein Effekt für *Tag* kleiner 1 zu erwarten. Das gleiche auf einer kürzeren Zeitachse für *Zeitpunkt* (prä|post). Es gibt anekdotische Hinweise auf individuell unterschiedlich betroffene Spielleistung des Tonleiter-auf- und -abwärtsspiels -- siehe Tab. 1 in @Jabusch2004; sollten sich diese Unterschiede in den Daten bestätigen, würde für den Schätzer *Aufwärts* ein Wert < 0 erwartet. Auch auf bei Dystonikern verstärkte Ermüdungserscheinungen gibt es Hinweise, denen durch die Modellierung des Parameters *Skalennummer* Rechnung getragen wird.
 
 Die Daten der Follow-up-Messung müssen aus der Analyse ausgeschlossen werden, da es sonst zur Konfundierung von Tag und Zeitpunkt kommt. Die Ergebnisse der modellierten Ergebnisse können hinterher aber in eine Follow-up-Analyse einfließen.
 
@@ -1068,90 +1068,66 @@ brms::loo_compare(
 
 `r kfigr::figr("ModelCompareTab")` zeigt, dass das Model *Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag)* am besten abschnitt, da sein elpd-Wert der kleinste aller miteinander verglichenen Modelle ist (siehe [Modellierung]). Diese Modell erklärt von allen untersuchten Modellen die vorliegenden Daten also am besten. Die Spalte *elpd_diff* der Tabelle zeigt, wie groß der "Abstand" eines Modells zum besten Modell ist, während die Spalte *se_diff* den Schätzfehler dieses Abstandes aufführt. Wenn die elpd-Differenz eines Modells mehr als zweimal den Wert seines Schätzfehlers entfernt von Null liegt, wird sein Unterschied zum besten Modell als bedeutsam erachtet. Dementsprechend sind nur die drei unteren in der Tabelle aufgeführten Modelle vom besten Modell zu unterscheiden.
 
-#### Polynomiale Regression
+#### Post-hoc-Tests
 
-Polynomiale Regression ist aus statistischer Sicht nicht das ideale Werkzeug, um den Effekt geordneter Faktoren (hier: die Stimulationstage; 1 < 8 < 15) zu untersuchen [z.B. @Harrell2015; ch. 2.4.2]. Anstatt dessen wären Splines vermutlich die bessere Lösung gewesen.
-
-Im Rahmens der polynomialen Regression wird die Rechtfertigung für die Aufnahme eines quadratischen Effektes herausgefordert durch den Test, ob sich die geschätzten Regressionsparameter beider Effekte unterscheiden.
-
-```{r}
-(hyp_polyreg <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-                  "Day.L = Day.Q"))
-```
-
-Im Bayes'schen Kontext werden die Prior solch einer Hypothese mit der posterioren Wahrscheinlichkeit verglichen. Wenn beide Verteilungen zu stark überlappen, wird die Hypothese als wahrscheinlich nicht zutreffend verworfen.
-
-```{r}
-plot(hyp_polyreg)
-```
-
-#### Unmittelbare Behandlungseffekte
-
-Wie in `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot")`E zu sehen, konnte kein Vorher-Nachher-Effekt bei der Spielunregelmäßigkeit innerhalb der Stimulationstage gezeigt werden (also gemittelt über beide Gruppen sowie aufwärts und abwärts gespielte Tonleitern).
-
-```{r}
-(hyp_time <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-                              c(pre_post = "Intercept = Intercept + Timepost")))
-```
-
-```{r}
-plot(hyp_time)
-```
-
-#### Unterschiede zwischen Stimulationstagen
-
-```{r}
-(hyp_day <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-                               c(day = "Intercept = Intercept + Day.L + Day.Q")))
-```
-
-```{r}
-plot(hyp_day)
-```
-
-#### Unterschiede zwischen Spielrichtungen
-
-`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`F legt nahe, dass die in @Jabusch2004 erwähnten Unterschiede in der Spielregelmäßigkeit zwischen Aufwärts- und Abwärtstonleitern auch im vorliegenden Datensatz existieren. Die modellierte Dreifach-Interaktion Tag:Zeit:Aufwärts ist in `r kfigr::figr("ThreewayIntWinnerModel", type = FIGREF)` gezeigt.
-
-```{r ThreewayIntWinnerModel, anchor=FIGREF}
-plot(brms::conditional_effects(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, 
-                               effects = "Day:Time", 
-                               conditions = data.frame(Ascend = factor(c(0, 1)))))[[1]] +
-  ggthemes::scale_color_colorblind() +
-  ggthemes::scale_fill_colorblind()
-```
-
-`r kfigr::figr("ThreewayIntWinnerModel")`. *Die Dreifach-Interaktion Tag:Zeit:Aufwärts. Links sind die geschätzten Standardabweichungen bei Abwärtstonleitern, rechts bei Aufwärtstonleitern gezeigt (Punkte: .*
+Die Zusammenfassung der festen Effekte aus `r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_summary")` werden im Auszug erneut in `r kfigr::figr("FixedEffectsWinner", type = TABREF)` gezeigt. 
 
 ***
 
-```{r}
-(hyp_ascend <- brms::hypothesis(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day,
-                                c(ascend = "Intercept = Intercept + Ascend1")))
+`r kfigr::figr("FixedEffectsWinner", type = TABREF)`. *Die festen Effekte des Gewinner-Modells.*
+
+```{r FixedEffectsWinner, anchor=TABREF}
+knitr::kable(brms::fixef(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day))
 ```
 
-```{r}
-plot(hyp_ascend)
+Die Schätzer der festen Effekte deuten außer bei der Spielrichtung nicht auf bedeutsame Einflüsse der experimentellen Faktoren auf die Gleichmäßigkeit des Tonleiterspiels hin; ein Interaktionsplot verdeutlicht das (`r kfigr::figr("FixedEffectsWinner", type = FIGREF)`). Dort zeigt sich deutlich, dass die posterioren Wahrscheinlichkeiten der Schätzer sehr stark überlappen, nur die Spielrichtung könnte leichte Effekte aufweisen.
+
+```{r FixedEffectsWinnerPlot, anchor=FIGREF}
+emmeans::emmip(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, 
+      Ascend ~ Day | Time, 
+      ylab = "Standard deviation of IOIs (in ms)",
+      facetlab = "label_both") + 
+  ggthemes::scale_color_colorblind()
 ```
 
-#### Langzeit-Effekt von tDCs
+`r kfigr::figr("FixedEffectsWinnerPlot")`. *Der Interaktionsplot zeigt für jede Bedingung den Median der zugehörigen posterioren Wahrscheinlichkeitsverteilung mit dem 95%-HPD-Intervall.*
 
-Um längerfristige Wirkung von tDCs auf die Regelmäßigkeit des Tonleiterspielens untersuchen zu können, wird im Folgenden ein **[...]**
+***
 
-```{r}
+Die geschätzten Mediane der posterioren Wahrscheinlichkeiten aller Bedingungskombinationen des Gewinner-Modells sind in `r kfigr::figr("EstMeansWinner", type = TABREF)` gezeigt.
 
+***
+
+`r kfigr::figr("EstMeansWinner")`. *Geschätzte Mediane aller Bedingungskombinationen des besten Modells. Die Spalten* Ascend, Day *und* Time *listen die jeweiligen Kombinationen der experimentellen Faktoren Aufsteigend, Tag und Zeitpunkt während der mittleren Tonleiter. Die Spalte* emmean *enthält die geschätzten Mediane, die Spalten* lower.HPD *und* upper.HPD *stellen die unteren und oberen Werte der höchsten posterioren Verteilungsdichte (Highest Posterior Density) dar.*
+
+```{r EstMeansWinner, anchor=TABREF}
+emm <- emmeans::emmeans(m_Day_x_Time_x_Ascend_Scale__1_ID__1_Day, 
+                        specs = list(pairwise ~ Ascend | Day + Time))
+knitr::kable(emm$`emmeans of Ascend | Day, Time`)
 ```
 
-# Diskussion
+`r kfigr::figr("PairwiseDiffs", type = TABREF)` stellt die Differenzen der Bedingungsmediane samt zugehöriger unteren und oberen HPD-Intervallen dar.
+
+***
+
+`r kfigr::figr("PairwiseDiffs")`. *Post-hoc-Differenzen der Bedingungen. Wenn ein HPD-Intervall den Wert 0 nicht überstreicht, kann davon ausgegangen werden, dass die Intervention einen Effekt zeitigte.*
+
+```{r PairwiseDiffs, anchor=TABREF}
+knitr::kable(emm$`pairwise differences of Ascend | Day, Time`)
+```
+
+Tatsächlich zeigen die paarweisen post-hoc-Tests in `r kfigr::figr("PairwiseDiffs")` Unterschiede zwischen Aufwärts- und Abwärtsspielrichtung am ersten und 15. Tag vor der Stimulation, sowie am ersten und 15. Tag nach der Stimulation. Die Spalte *estimate* zeigt aber auch, dass sich die Mediane der Spielrichtungen um bescheidene 2 bis 4 ms unterschieden. 
+
+### Langzeitwirkung
+
+Nachdem in den Daten weder ein Vorher-Nachher-Effekt von tDCS auf die Regelmäßigkeit des Tonleiterspiels gefunden wurde, noch einer zwischen den einzelnen Stimulationstagen, ist es müßig, einen Langzeiteffekt zu untersuchen.
+
+## Diskussion
 
 Die winzige Stichprobengröße wäre eine mögliche Erklärung, warum das theoretisch passendere Modell (*Tag x Zeit x Aufwärts + Skala + (1|ID) + (1|Tag) + (1|Zeit)*) die Daten nicht am besten erklärt, da kleine Stichproben häufiger eine sehr große Varianz aufweisen und deshalb kein statistisch relevanter Unterschied zwischen Experimentalbedingungen feststellbar ist. Eine weitere Erklärung ist, dass zwischen den den Populationseffekten wirklich keine Interaktion existiert.
 
 Die Modellierungsergebnisse im Abschnitt [Tag x Zeitpunkt x Aufwärts + Skala + (1 | ID) + (1 | Tag)] und deren nähere Untersuchung im Abschnitt [Modell-Vergleich] zeigen, dass es in den vorliegenden Daten keinen Hinweis auf eine unmittelbare Wirkung der tDC-Stimulation gibt, da es an keinem der drei Stimulationstage Vorher-Nachher-Effekte zu geben scheint. Auch gibt keine eine Verbesserung der Spielunregelmäßigkeit zwischen dem ersten und dem zweiten Tag (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day__1_Time__1_Ascend_CondPlot")`E). 
 
-Die Standardabweichungen der Aufwärts- und Abwärtstonleitern entwickeln sich jedoch im Laufe der dreiwöchigen Stimulation deutlich auseinander, was sich in (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot")`G) so darstellt, als ob es bei den Abwärtstonleitern kaum Veränderungen gibt, sich die Regelmäßigkeit der Aufwärtstonleitern sich aber deutlich verbessert.
-
-#### Einschränkungen
-
-Die Studie hat mehrere Limitierungen, die die Interpretation der Ergebnisse erschwert. Der augenfälligste Faktor ist die sehr kleine Stichprobe. Der zweite Faktor ist die in die Modelle eingeflossenen Annahme, dass die 
+Die Standardabweichungen der Aufwärts- und Abwärtstonleitern entwickeln sich jedoch im Laufe der dreiwöchigen Stimulation deutlich auseinander, was sich in (`r kfigr::figr("Day_x_Time_x_Ascend_Scale__1_ID__1_Day_CondPlot")`G) so darstellt, als ob es bei den Abwärtstonleitern kaum Veränderungen gibt, sich die Regelmäßigkeit der Aufwärtstonleitern aber deutlich verbessert. `r kfigr::figr("FixedEffectsWinnerPlot")` zeigt aber deutlich, dass auch dieser Effekt recht schwach ist.
 
 ## Literatur

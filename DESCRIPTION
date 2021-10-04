@@ -12,6 +12,7 @@ LazyData: true
 Suggests: 
     brms,
     dplyr,
+    emmeans,
     ggplot2,
     kfigr,
     knitr,
